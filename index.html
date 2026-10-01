@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0b0b">
+<title>Live Matches · Sports 803</title>
+<meta name="description" content="Live and upcoming sports matches, updated in real time.">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Live Matches · Sports 803">
+<meta property="og:description" content="Live and upcoming sports matches, updated in real time.">
+<meta property="og:type" content="website">
+
+<!-- Favicon (inline SVG so no extra file needed) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23e53935'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-family='Arial' font-size='13' font-weight='bold'%3E803%3C/text%3E%3C/svg%3E">
+
+<style>
+/* ─── Base ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: #0a0a0a;
+  color: #efefef;
+  font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ─── Page shell ──────────────────────────────────────────── */
+.s803-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+.s803-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.s803-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  background: #e53935;
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+.s803-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+.s803-title small {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: #777;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.s803-status {
+  margin-left: auto;
+  font-size: 11px;
+  color: #666;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.s803-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34,197,94,.6);
+  animation: s803-pulse 2s ease-in-out infinite;
+}
+.s803-status.is-offline .s803-status-dot { background: #e53935; }
+
+/* ─── Filter pills ────────────────────────────────────────── */
+.s803-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+          mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+}
+.s803-filters::-webkit-scrollbar { display: none; }
+.s803-pill {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid #242424;
+  background: rgba(255,255,255,0.04);
+  color: #9a9a9a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.s803-pill:hover { color: #efefef; border-color: #333; }
+.s803-pill.is-active {
+  background: #e53935;
+  border-color: #e53935;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(229,57,53,0.28);
+}
+.s803-pill .s803-pill-count {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MATCH FEED — same CSS as your Blogger widget
+   ═══════════════════════════════════════════════════════════ */
+.s803w, .s803w * { box-sizing: border-box; }
+.s803w {
+  width: 100%; max-width: 100%;
+  margin: 0; padding: 0;
+  font-family: 'Barlow', Arial, sans-serif;
+}
+.s803w > [id="s803-matches"],
+.s803w > .s803-match-feed {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%; min-width: 0;
+  margin: 0; padding: 0;
+}
+.s803-feed-hd, .s803-empty, .s803-skel { grid-column: 1 / -1; }
+
+.match-card {
+  width: 100%; min-width: 0; margin: 0;
+  overflow: hidden;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  transition: border-color .2s, box-shadow .2s, transform .15s;
+}
+.match-card:hover { border-color: #e53935; transform: translateY(-2px); }
+.match-card.is-live {
+  border-color: rgba(229,57,53,.5);
+  box-shadow: 0 0 0 1px rgba(229,57,53,.12);
+}
+.match-card > a { display: block; color: #fff; text-decoration: none; }
+.match-card > a:hover { background: rgba(255,255,255,.02); }
+
+.match-row {
+  display: flex; align-items: center; justify-content: space-between;
+  min-width: 0;
+  padding: 12px 10px;
+}
+.match-card .team {
+  display: flex; flex: 0 1 70px;
+  flex-direction: column; align-items: center;
+  gap: 5px; min-width: 0; text-align: center;
+}
+.match-card .tlogo,
+.match-card .tlogo-fb {
+  width: 44px; height: 44px; flex: 0 0 44px;
+  border-radius: 50%;
+}
+.match-card .tlogo { object-fit: contain; background: #1a1a1a; padding: 4px; }
+.match-card .tlogo-fb {
+  display: none; align-items: center; justify-content: center;
+  background: #1a1a1a; font-size: 19px;
+}
+.match-card .tname {
+  width: 100%; overflow: hidden;
+  color: #ccc; font-size: 10px; line-height: 1.25;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.match-card .mc { flex: 1 1 auto; min-width: 0; padding: 0 3px; text-align: center; }
+.match-card .score {
+  overflow: hidden; color: #fff; font-size: 19px; font-weight: 800;
+  letter-spacing: 1px; text-overflow: ellipsis; white-space: nowrap;
+}
+.match-card .badge {
+  display: inline-block; margin-top: 5px;
+  padding: 3px 7px; border-radius: 20px;
+  font-size: 9px; font-weight: 600; letter-spacing: .3px;
+  white-space: nowrap;
+}
+.match-card .badge.upcoming { color: #4caf50; background: #1a2a1a; border: 1px solid #2e5c2e; }
+.match-card .badge.live { color: #fff; background: #e53935; animation: s803p 1.5s infinite; }
+.match-card .badge.ended { color: #666; background: #1e1e1e; border: 1px solid #333; }
+.match-card .cd { min-height: 13px; margin-top: 3px; color: #666; font-size: 9px; white-space: nowrap; }
+
+.match-meta {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 4px; min-width: 0;
+  padding: 7px 9px;
+  border-top: 1px solid #1c1c1c;
+}
+.match-card .meta-tag {
+  max-width: 100%; overflow: hidden;
+  padding: 3px 6px;
+  color: #777; background: #1a1a1a;
+  border-radius: 6px; font-size: 9px;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.match-card .meta-tag:first-child {
+  color: #e53935; background: rgba(229,57,53,.1);
+  border: 1px solid rgba(229,57,53,.2);
+}
+.match-card .watch-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  margin-left: auto; padding: 3px 7px;
+  color: #ef9a9a;
+  background: rgba(229,57,53,.12);
+  border: 1px solid rgba(229,57,53,.3);
+  border-radius: 20px;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .2px; text-decoration: none; white-space: nowrap;
+}
+.match-card .watch-btn:hover { color: #fff; background: rgba(229,57,53,.25); }
+
+.s803-feed-hd { display: flex; align-items: center; gap: 8px; margin: 0 0 2px; }
+.s803-feed-hd h3 {
+  margin: 0; color: #efefef;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.s803-feed-ct {
+  padding: 1px 8px;
+  color: #e53935; background: rgba(229,57,53,.1);
+  border: 1px solid rgba(229,57,53,.2);
+  border-radius: 20px;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  font-size: 11px; font-weight: 700;
+}
+.s803-skel {
+  height: 130px; margin: 0; border-radius: 12px;
+  background: linear-gradient(90deg,#111 25%,#171717 37%,#111 63%);
+  background-size: 400% 100%;
+  animation: s803sk 1.3s ease infinite;
+}
+.s803-empty {
+  padding: 26px 16px;
+  color: #666; background: #111;
+  border: 1px solid #222; border-radius: 12px;
+  font-size: 13px; text-align: center;
+}
+.s803-empty b {
+  display: block; margin-bottom: 4px; color: #999;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  font-size: 14px; letter-spacing: 1px;
+}
+@keyframes s803p { 0%,100%{opacity:1} 50%{opacity:.6} }
+@keyframes s803sk { 0%{background-position:100% 50%} 100%{background-position:0 50%} }
+@keyframes s803-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.6)} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0)} }
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 899px) {
+  .s803w > [id="s803-matches"],
+  .s803w > .s803-match-feed { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+}
+@media (max-width: 420px) {
+  .match-row { padding: 10px 6px; }
+  .match-card .team { flex-basis: 58px; }
+  .match-card .tlogo,
+  .match-card .tlogo-fb { width: 38px; height: 38px; flex-basis: 38px; }
+  .match-card .tname { font-size: 9px; }
+  .match-card .score { font-size: 17px; }
+  .match-card .badge { padding: 2px 5px; font-size: 8px; }
+  .match-card .meta-tag { font-size: 8px; }
+  .match-card .watch-btn { font-size: 8px; }
+  .s803-page { padding: 16px 10px 48px; }
+  .s803-title { font-size: 18px; }
+}
+
+/* ─── Footer ──────────────────────────────────────────────── */
+.s803-footer {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid #1c1c1c;
+  font-size: 11px;
+  color: #555;
+  text-align: center;
+}
+.s803-footer a { color: #888; }
+.s803-footer a:hover { color: #e53935; }
+</style>
+</head>
+<body>
+
+<div class="s803-page">
+
+  <header class="s803-header">
+    <div class="s803-logo">803</div>
+    <h1 class="s803-title">
+      Live Matches
+      <small>Sports 803 · Real-time feed</small>
+    </h1>
+    <div class="s803-status" id="s803-status">
+      <span class="s803-status-dot"></span>
+      <span id="s803-status-text">Connecting…</span>
+    </div>
+  </header>
+
+  <nav class="s803-filters" id="s803-filters" aria-label="Filter matches">
+    <button class="s803-pill is-active" data-filter="all">All <span class="s803-pill-count" data-count="all">0</span></button>
+    <button class="s803-pill" data-filter="live">🔴 Live <span class="s803-pill-count" data-count="live">0</span></button>
+    <button class="s803-pill" data-filter="upcoming">Upcoming <span class="s803-pill-count" data-count="upcoming">0</span></button>
+    <button class="s803-pill" data-filter="ended">Ended <span class="s803-pill-count" data-count="ended">0</span></button>
+  </nav>
+
+  <div class="s803w">
+    <div id="s803-matches" data-limit="48"></div>
+  </div>
+
+  <footer class="s803-footer">
+    <a href="https://sports803livestream.blogspot.com" target="_blank" rel="noopener">Sports 803</a>
+    · Data updates every 45 s
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ─────────────────────────────────────────────
+     CONFIG — edit these
+     ───────────────────────────────────────────── */
+  var FB_URL         = 'https://sports-803-1b806-default-rtdb.firebaseio.com';
+  var SITE_ID        = '';              // blank = read root-level "match_events"
+  var POLL_MS        = 45000;           // auto-refresh cadence
+  var KEEP_ENDED_MS  = 3 * 3600000;     // hide ended matches after 3 h
+  /* ─────────────────────────────────────────── */
+
+  var LIVE_S = ['STATUS_IN_PROGRESS','STATUS_HALFTIME','STATUS_IN_PROGRESS_2','STATUS_END_PERIOD','STATUS_OVERTIME','STATUS_SHOOTOUT'];
+  var END_S  = ['STATUS_FINAL','STATUS_FULL_TIME','STATUS_FINAL_OT','STATUS_FINAL_PEN','STATUS_POSTPONED','STATUS_CANCELED','STATUS_SUSPENDED','STATUS_ABANDONED'];
+
+  var state = {
+    data: {},
+    filter: 'all',
+    lastFetchOk: false
+  };
+
+  /* ── Helpers ─────────────────────────────── */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+      .replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function feedUrl() {
+    var base = FB_URL.replace(/\/+$/, '');
+    var ns = SITE_ID ? SITE_ID.replace(/^\/+|\/+$/g, '') + '/' : '';
+    return base + '/' + ns + 'match_events.json';
+  }
+  function statusOf(p) {
+    if (p.statusType) {
+      if (LIVE_S.indexOf(p.statusType) > -1) return 'live';
+      if (END_S.indexOf(p.statusType)  > -1) return 'ended';
+    }
+    var t = new Date(p.kickoff).getTime();
+    if (isNaN(t)) return 'upcoming';
+    var now = Date.now();
+    if (now < t) return 'upcoming';
+    if (now < t + 6300000) return 'live';
+    return 'ended';
+  }
+  function labelOf(p, st) {
+    if (p.statusLabel) return p.statusLabel;
+    return st === 'live' ? 'LIVE' : st === 'ended' ? 'Ended' : 'Upcoming';
+  }
+  function timeLabel(iso) {
+    var d = new Date(iso);
+    if (isNaN(d)) return '--:--';
+    var h = d.getHours(), m = d.getMinutes(), ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return h + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
+  }
+  function fallbackLogo(name) {
+    return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name || '?') +
+           '&size=64&background=1a1a1a&color=e53935&bold=true&rounded=true';
+  }
+
+  /* ── Card markup ─────────────────────────── */
+  function cardHtml(p) {
+    var st      = statusOf(p);
+    var lbl     = labelOf(p, st);
+    var score   = p.score || (p.isRacing ? '🏁' : '- -');
+    var emoji   = p.leagueEmoji || '⚽';
+    var href    = p.postUrl || '#';
+
+    var home = '<div class="team">' +
+      '<img class="tlogo" src="' + esc(p.homeLogo || fallbackLogo(p.homeName)) + '" alt="' + esc(p.homeName) + '" ' +
+      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
+      '<div class="tlogo-fb">' + emoji + '</div>' +
+      '<div class="tname">' + esc(p.homeName) + '</div></div>';
+
+    var away = p.isRacing
+      ? '<div class="team"><div class="tlogo" style="display:flex;align-items:center;justify-content:center;font-size:22px">' + emoji + '</div>' +
+        '<div class="tname">' + esc(p.leagueName) + '</div></div>'
+      : '<div class="team">' +
+        '<img class="tlogo" src="' + esc(p.awayLogo || fallbackLogo(p.awayName)) + '" alt="' + esc(p.awayName) + '" ' +
+        'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
+        '<div class="tlogo-fb">' + emoji + '</div>' +
+        '<div class="tname">' + esc(p.awayName) + '</div></div>';
+
+    var watch = p.channelUrl
+      ? '<a class="watch-btn" href="' + esc(p.channelUrl) + '" rel="noopener">📺 Watch' +
+        (p.channelName ? ' · ' + esc(p.channelName) : '') + '</a>'
+      : '';
+
+    return '<div class="match-card' + (st === 'live' ? ' is-live' : '') + '" data-kickoff="' + esc(p.kickoff) + '">' +
+      '<a href="' + esc(href) + '"><div class="match-row">' +
+        home +
+        '<div class="mc"><div class="score">' + esc(score) + '</div>' +
+        '<div class="badge ' + st + '">' + esc(lbl) + '</div><div class="cd"></div></div>' +
+        away +
+      '</div></a>' +
+      '<div class="match-meta">' +
+        '<div class="meta-tag">' + emoji + ' ' + esc(p.leagueName || '') + '</div>' +
+        '<div class="meta-tag">' + timeLabel(p.kickoff) + '</div>' +
+        watch +
+      '</div></div>';
+  }
+
+  /* ── Get the filtered list ───────────────── */
+  function filteredList() {
+    var now = Date.now();
+    var list = Object.keys(state.data || {})
+      .map(function (k) { return state.data[k]; })
+      .filter(function (p) {
+        if (!p || !p.kickoff) return false;
+        var st = statusOf(p);
+        if (state.filter !== 'all' && st !== state.filter) return false;
+        if (st === 'ended') {
+          var t = new Date(p.kickoff).getTime();
+          if (!isNaN(t) && now - t > KEEP_ENDED_MS + 6300000) return false;
+        }
+        return true;
+      });
+
+    var order = { live: 0, upcoming: 1, ended: 2 };
+    list.sort(function (a, b) {
+      var sa = order[statusOf(a)], sb = order[statusOf(b)];
+      if (sa !== sb) return sa - sb;
+      return new Date(a.kickoff) - new Date(b.kickoff);
+    });
+    return list;
+  }
+
+  /* ── Render ──────────────────────────────── */
+  function render() {
+    var box = $('s803-matches');
+    if (!box) return;
+    var limit = parseInt(box.getAttribute('data-limit'), 10) || 48;
+    var list = filteredList().slice(0, limit);
+
+    updateFilterCounts();
+
+    if (!list.length) {
+      box.innerHTML = '<div class="s803-empty"><b>Nothing scheduled right now</b>Check back closer to kick-off.</div>';
+      return;
+    }
+    box.innerHTML = list.map(cardHtml).join('');
+    tick();
+  }
+
+  function updateFilterCounts() {
+    var counts = { all: 0, live: 0, upcoming: 0, ended: 0 };
+    var now = Date.now();
+    Object.keys(state.data || {}).forEach(function (k) {
+      var p = state.data[k];
+      if (!p || !p.kickoff) return;
+      var st = statusOf(p);
+      if (st === 'ended') {
+        var t = new Date(p.kickoff).getTime();
+        if (!isNaN(t) && now - t > KEEP_ENDED_MS + 6300000) return;
+      }
+      counts.all++;
+      counts[st] = (counts[st] || 0) + 1;
+    });
+    document.querySelectorAll('.s803-pill-count').forEach(function (el) {
+      var key = el.getAttribute('data-count');
+      el.textContent = counts[key] || 0;
+    });
+  }
+
+  /* ── Local countdown / status ticker ─────── */
+  function tick() {
+    var cards = document.querySelectorAll('.match-card[data-kickoff]');
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      var ko = card.getAttribute('data-kickoff');
+      if (!ko) continue;
+      var diff = new Date(ko) - Date.now();
+      var cd = card.querySelector('.cd');
+      var badge = card.querySelector('.badge');
+      if (!cd) continue;
+      if (diff > 0) {
+        var h = Math.floor(diff / 3600000), m = Math.floor(diff % 3600000 / 60000), s = Math.floor(diff % 60000 / 1000);
+        cd.textContent = h > 0 ? 'In ' + h + 'h ' + m + 'm'
+                       : m > 0 ? 'In ' + m + 'm ' + s + 's'
+                       : 'Starting!';
+        if (badge && badge.className.indexOf('ended') === -1) {
+          badge.textContent = 'Upcoming';
+          badge.className = 'badge upcoming';
+        }
+        card.classList.remove('is-live');
+      } else if (diff > -6300000) {
+        cd.textContent = '';
+        if (badge && badge.className.indexOf('ended') === -1) {
+          badge.textContent = '🔴 LIVE';
+          badge.className = 'badge live';
+        }
+        card.classList.add('is-live');
+      } else {
+        cd.textContent = '';
+        if (badge) { badge.textContent = 'Ended'; badge.className = 'badge ended'; }
+        card.classList.remove('is-live');
+      }
+    }
+  }
+
+  /* ── Network status pill ─────────────────── */
+  function setStatus(ok, text) {
+    state.lastFetchOk = ok;
+    var el = $('s803-status');
+    var txt = $('s803-status-text');
+    if (!el || !txt) return;
+    el.classList.toggle('is-offline', !ok);
+    txt.textContent = text;
+  }
+
+  /* ── Fetch ───────────────────────────────── */
+  function load() {
+    var box = $('s803-matches');
+    if (!box) return;
+
+    fetch(feedUrl(), { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        state.data = data || {};
+        render();
+        var t = new Date();
+        setStatus(true, 'Live · ' + t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      })
+      .catch(function (err) {
+        console.warn('[S803] feed error:', err && err.message);
+        setStatus(false, 'Offline · retrying');
+        if (!box.querySelector('.match-card')) {
+          box.innerHTML = '<div class="s803-empty"><b>Matches unavailable</b>Refresh in a moment.</div>';
+        }
+      });
+  }
+
+  /* ── Boot ────────────────────────────────── */
+  function boot() {
+    var box = $('s803-matches');
+    if (box) {
+      box.innerHTML =
+        '<div class="s803-skel"></div><div class="s803-skel"></div>' +
+        '<div class="s803-skel"></div><div class="s803-skel"></div>';
+    }
+
+    /* Filter buttons */
+    document.querySelectorAll('.s803-pill').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.s803-pill').forEach(function (b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        state.filter = btn.getAttribute('data-filter') || 'all';
+        render();
+      });
+    });
+
+    load();
+    setInterval(load, POLL_MS);
+    setInterval(tick, 1000);
+
+    /* Pause polling when tab is hidden — saves battery + Firebase quota */
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') load();
+    });
+
+    /* Refresh on network recovery */
+    window.addEventListener('online', load);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+
+</body>
+</html>
