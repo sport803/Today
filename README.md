@@ -8,12 +8,12 @@ The source publishes a usable RSS feed at `https://www.sport803.online/feeds/pos
 
 - Runs every 15 minutes and can also be launched manually.
 - Rebuilds `docs/index.html` from up to 100 current feed entries.
-- Queues each new or updated feed item once per configured channel. On the first live run, it posts only the newest feed item and seeds older entries as already handled, avoiding a historical posting backlog. Delivery state is stored in `.autopost-state.json`; successful per-channel sends are persisted immediately so a partial failure does not unnecessarily duplicate the already-sent channel.
+- Publishes each new or updated feed item once per configured channel using Buffer's `shareNow` mode. On the first live run, it publishes only the newest feed item and seeds older entries as already handled, avoiding a historical backlog. Delivery state is stored in `.autopost-state.json`; successful per-channel sends are persisted immediately to avoid unnecessary duplicates after partial failures.
 - Limits each run to 1 new event by default (`MAX_POSTS_PER_RUN`) and processes older pending entries first. This means at most 2 Buffer calls per scheduled run, or 192 calls in a day of 15-minute runs, below Buffer’s stated 250-call Free-plan daily limit.
-- Facebook text is `title` + newline + the original article URL, preserving the URL that generates the link preview.
+- Facebook text is `title` + newline + the original article URL. The workflow also supplies `metadata.facebook.linkAttachment` using the article's Open Graph title, description, and image so Buffer creates a rich link card.
 - X text is `title` + newline + `https://sport803.github.io/Today/`.
 - Buffer requests use bounded exponential backoff and honor retry/rate-limit headers when present.
-- Manual runs default to dry-run. Scheduled runs publish normally.
+- Manual autopost runs default to dry-run. Scheduled runs publish immediately with `shareNow`.
 - Existing posts can be inspected or switched from the queue to immediate publication with the separate **Publish existing Buffer posts now** workflow. It reads status/actions without changes in check-only mode, or edits known Buffer post IDs using `shareNow` instead of creating duplicate posts.
 
 ## Setup

@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from autopost import Event, buffer_create_post, parse_feed, render_index
+from autopost import Event, buffer_create_post, fetch_facebook_link_attachment, parse_feed, render_index
 from publish_queued_now import inspect_post, publish_now
 
 class FeedTests(unittest.TestCase):
@@ -48,15 +48,46 @@ class FeedTests(unittest.TestCase):
 
         post = buffer_create_post(
             "Event title\nhttps://example.com/event", "facebook-channel", "test-key",
-            session=session, metadata={"facebook": {"type": "post"}},
+            session=session, metadata={"facebook": {
+                "type": "post",
+                "linkAttachment": {
+                    "url": "https://example.com/event", "title": "Event title",
+                    "description": "Match details", "thumbnail": {"url": "https://example.com/card.jpg"},
+                },
+            }},
         )
 
         self.assertEqual(post["id"], "post-1")
         payload = session.post.call_args.kwargs["json"]
         self.assertEqual(
             payload["variables"]["input"]["metadata"],
-            {"facebook": {"type": "post"}},
+            {"facebook": {
+                "type": "post",
+                "linkAttachment": {
+                    "url": "https://example.com/event", "title": "Event title",
+                    "description": "Match details", "thumbnail": {"url": "https://example.com/card.jpg"},
+                },
+            }},
         )
+        self.assertEqual(payload["variables"]["input"]["mode"], "shareNow")
+
+    def test_facebook_attachment_uses_first_nonempty_open_graph_values(self):
+        response = Mock(status_code=200, headers={})
+        response.text = '''<meta property="og:title" content="Card title">
+          <meta property="og:description" content="Great match details">
+          <meta property="og:image" content="https://example.com/card.jpg">
+          <meta property="og:description" content="">'''
+        session = Mock()
+        session.get.return_value = response
+
+        attachment = fetch_facebook_link_attachment(
+            Event("Feed title", "https://example.com/event", "now"), session=session,
+        )
+
+        self.assertEqual(attachment, {
+            "url": "https://example.com/event", "title": "Card title",
+            "description": "Great match details", "thumbnail": {"url": "https://example.com/card.jpg"},
+        })
 
     def test_publish_now_edits_existing_post_instead_of_creating_one(self):
         response = Mock(status_code=200, headers={})

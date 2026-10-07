@@ -11,6 +11,7 @@ import time
 import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -80,6 +81,52 @@ def fetch_events(session: requests.Session | None = None) -> list[Event]:
     response = client.get(FEED_URL, timeout=(10, 30), headers={"User-Agent": "sport803-autopost/1.0"})
     response.raise_for_status()
     return parse_feed(response.text)
+
+
+class _OpenGraphParser(HTMLParser):
+    """Collect the first non-empty value for each Open Graph metadata tag."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.tags: dict[str, str] = {}
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() != "meta":
+            return
+        values = dict(attrs)
+        key = (values.get("property") or "").lower()
+        content = (values.get("content") or "").strip()
+        # Some Blogger themes emit a later, empty duplicate; keep the first useful value.
+        if key.startswith("og:") and content:
+            self.tags.setdefault(key, content)
+
+
+def fetch_facebook_link_attachment(event: Event,
+                                   session: requests.Session | None = None) -> dict[str, Any]:
+    """Build Buffer's explicit Facebook link card from an article's Open Graph tags."""
+    client = session or requests.Session()
+    attachment: dict[str, Any] = {
+        "url": event.url,
+        "title": event.title,
+        "description": "Live and upcoming sports events from Sports 803.",
+    }
+    try:
+        response = client.get(event.url, timeout=(10, 25), headers={"User-Agent": "Mozilla/5.0 (compatible; Sports803Preview/1.0)"})
+        response.raise_for_status()
+        parser = _OpenGraphParser()
+        parser.feed(response.text)
+    except requests.RequestException as exc:
+        LOG.warning("Could not read Open Graph tags for %s: %s; using fallback card details", event.url, exc)
+        return attachment
+
+    attachment["title"] = parser.tags.get("og:title") or event.title
+    attachment["description"] = parser.tags.get("og:description") or attachment["description"]
+    image_url = parser.tags.get("og:image", "")
+    if _is_http_url(image_url):
+        attachment["thumbnail"] = {"url": image_url}
+    else:
+        LOG.warning("No usable og:image for %s; Facebook link card will have no thumbnail", event.url)
+    return attachment
 
 
 def render_index(events: list[Event], generated_at: datetime | None = None) -> str:
@@ -168,7 +215,7 @@ def buffer_create_post(text: str, channel_id: str, api_key: str,
                        session: requests.Session | None = None,
                        max_attempts: int = 5,
                        metadata: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Create one queued Buffer post, retrying transient and rate-limit errors."""
+    """Create one immediate Buffer post, retrying transient and rate-limit errors."""
     client = session or requests.Session()
     query = """mutation CreatePost($input: CreatePostInput!) {
       createPost(input: $input) {
@@ -178,7 +225,7 @@ def buffer_create_post(text: str, channel_id: str, api_key: str,
     }"""
     post_input: dict[str, Any] = {
         "text": text, "channelId": channel_id,
-        "schedulingType": "automatic", "mode": "addToQueue",
+        "schedulingType": "automatic", "mode": "shareNow",
     }
     if metadata:
         post_input["metadata"] = metadata
@@ -281,11 +328,18 @@ def run(*, dry_run: bool = False) -> int:
             if dry_run:
                 LOG.info("DRY RUN [%s] %s", name, text.replace("\n", " | "))
                 continue
-            metadata = {"facebook": {"type": "post"}} if name == "facebook" else None
+            metadata = None
+            if name == "facebook":
+                metadata = {
+                    "facebook": {
+                        "type": "post",
+                        "linkAttachment": fetch_facebook_link_attachment(event),
+                    }
+                }
             post = buffer_create_post(text, channel, key, metadata=metadata)
             progress[name] = True
             save_state(state)
-            LOG.info("Queued %s post %s for %s", name, post.get("id", "(no id)"), event.title)
+            LOG.info("Published %s post %s with shareNow for %s", name, post.get("id", "(no id)"), event.title)
     if not dry_run:
         # Keep state bounded without dropping recent outstanding fingerprints.
         if len(state) > 500:
