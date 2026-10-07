@@ -14,7 +14,7 @@ The source publishes a usable RSS feed at `https://www.sport803.online/feeds/pos
 - X text is `title` + newline + `https://sport803.github.io/Today/`.
 - Buffer requests use bounded exponential backoff and honor retry/rate-limit headers when present.
 - Manual runs default to dry-run. Scheduled runs publish normally.
-- Existing posts can be switched from the queue to immediate publication with the separate **Publish existing Buffer posts now** workflow. It edits known Buffer post IDs using `shareNow` instead of creating duplicate posts.
+- Existing posts can be inspected or switched from the queue to immediate publication with the separate **Publish existing Buffer posts now** workflow. It reads status/actions without changes in check-only mode, or edits known Buffer post IDs using `shareNow` instead of creating duplicate posts.
 
 ## Setup
 
@@ -46,7 +46,7 @@ The source publishes a usable RSS feed at `https://www.sport803.online/feeds/pos
    ```
 
    The checker validates `og:title`, `og:description`, `og:image`, and `og:url`. Facebook may cache preview data; use [Meta Sharing Debugger](https://developers.facebook.com/tools/debug/) to refresh that cache if needed.
-7. To publish an already queued post immediately, open **Actions → Publish existing Buffer posts now → Run workflow** and enter its existing Facebook and X post IDs plus their exact current text. Keep the text unchanged. This edits those posts to Buffer's `shareNow` mode; it does not create new posts.
+7. To inspect or publish already queued posts, open **Actions → Publish existing Buffer posts now → Run workflow** and enter the existing Facebook and X post IDs plus their exact current text. Keep the text unchanged. Enable `check_only` to inspect status/permissions without mutation; otherwise, this edits those posts to Buffer's `shareNow` mode and does not create new posts.
 
 ## Local development
 
