@@ -64,13 +64,19 @@ class FeedTests(unittest.TestCase):
         session = Mock()
         session.post.return_value = response
 
-        post = publish_now("existing-1", "test-key", session=session)
+        post = publish_now(
+            "existing-1", "Approved text", "test-key", session=session,
+            metadata={"facebook": {"type": "post"}},
+        )
 
         self.assertEqual(post["id"], "existing-1")
         payload = session.post.call_args.kwargs["json"]
         self.assertIn("editPost", payload["query"])
         self.assertNotIn("createPost", payload["query"])
-        self.assertEqual(payload["variables"]["input"], {"id": "existing-1", "mode": "shareNow"})
+        self.assertEqual(payload["variables"]["input"], {
+            "id": "existing-1", "text": "Approved text", "mode": "shareNow",
+            "metadata": {"facebook": {"type": "post"}},
+        })
 
 if __name__ == "__main__":
     unittest.main()

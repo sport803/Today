@@ -7,8 +7,16 @@ on:
         description: 'Existing queued Facebook post ID'
         required: true
         type: string
+      facebook_text:
+        description: 'Exact existing Facebook text; keep unchanged'
+        required: true
+        type: string
       twitter_post_id:
         description: 'Existing queued X/Twitter post ID'
+        required: true
+        type: string
+      twitter_text:
+        description: 'Exact existing X text; keep unchanged'
         required: true
         type: string
 
@@ -41,8 +49,12 @@ jobs:
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           FACEBOOK_POST_ID: ${{ inputs.facebook_post_id }}
+          FACEBOOK_POST_TEXT: ${{ inputs.facebook_text }}
           TWITTER_POST_ID: ${{ inputs.twitter_post_id }}
+          TWITTER_POST_TEXT: ${{ inputs.twitter_text }}
         run: >-
           python scripts/publish_queued_now.py
           --facebook-post-id "$FACEBOOK_POST_ID"
           --twitter-post-id "$TWITTER_POST_ID"
+          --facebook-text "$FACEBOOK_POST_TEXT"
+          --twitter-text "$TWITTER_POST_TEXT"

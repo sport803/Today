@@ -14,8 +14,9 @@ BUFFER_URL = "https://api.buffer.com"
 LOG = logging.getLogger("publish_now")
 
 
-def publish_now(post_id: str, api_key: str,
-                session: requests.Session | None = None) -> dict[str, Any]:
+def publish_now(post_id: str, text: str, api_key: str,
+                session: requests.Session | None = None,
+                metadata: dict[str, Any] | None = None) -> dict[str, Any]:
     """Set an existing queued post's ShareMode to shareNow using editPost."""
     query = """mutation PublishPostNow($input: EditPostInput!) {
       editPost(input: $input) {
@@ -24,10 +25,13 @@ def publish_now(post_id: str, api_key: str,
       }
     }"""
     client = session or requests.Session()
+    post_input: dict[str, Any] = {"id": post_id, "text": text, "mode": "shareNow"}
+    if metadata:
+        post_input["metadata"] = metadata
     try:
         response = client.post(
             BUFFER_URL,
-            json={"query": query, "variables": {"input": {"id": post_id, "mode": "shareNow"}}},
+            json={"query": query, "variables": {"input": post_input}},
             timeout=(10, 30),
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         )
@@ -54,6 +58,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--facebook-post-id", required=True, help="Existing queued Facebook post ID")
     parser.add_argument("--twitter-post-id", required=True, help="Existing queued X/Twitter post ID")
+    parser.add_argument("--facebook-text", required=True, help="Approved Facebook post text")
+    parser.add_argument("--twitter-text", required=True, help="Approved X post text")
     args = parser.parse_args()
     api_key = os.getenv("BUFFER_API_KEY", "").strip()
     if not api_key:
@@ -64,8 +70,12 @@ def main() -> int:
     logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper(), format="%(levelname)s: %(message)s")
     try:
         with requests.Session() as session:
-            for channel, post_id in (("Facebook", args.facebook_post_id), ("X", args.twitter_post_id)):
-                post = publish_now(post_id, api_key, session=session)
+            posts = (
+                ("Facebook", args.facebook_post_id, args.facebook_text, {"facebook": {"type": "post"}}),
+                ("X", args.twitter_post_id, args.twitter_text, None),
+            )
+            for channel, post_id, text, metadata in posts:
+                post = publish_now(post_id, text, api_key, session=session, metadata=metadata)
                 LOG.info("Set existing %s post %s to publish now", channel, post.get("id", post_id))
         return 0
     except RuntimeError as exc:

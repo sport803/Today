@@ -46,7 +46,7 @@ The source publishes a usable RSS feed at `https://www.sport803.online/feeds/pos
    ```
 
    The checker validates `og:title`, `og:description`, `og:image`, and `og:url`. Facebook may cache preview data; use [Meta Sharing Debugger](https://developers.facebook.com/tools/debug/) to refresh that cache if needed.
-7. To publish an already queued post immediately, open **Actions → Publish existing Buffer posts now → Run workflow** and enter its existing Facebook and X post IDs. This changes those posts to Buffer's `shareNow` mode; it does not create new posts.
+7. To publish an already queued post immediately, open **Actions → Publish existing Buffer posts now → Run workflow** and enter its existing Facebook and X post IDs plus their exact current text. Keep the text unchanged. This edits those posts to Buffer's `shareNow` mode; it does not create new posts.
 
 ## Local development
 
