@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from autopost import Event, buffer_create_post, parse_feed, render_index
+from publish_queued_now import publish_now
 
 class FeedTests(unittest.TestCase):
     def test_rss_entries_and_duplicate_urls(self):
@@ -56,6 +57,20 @@ class FeedTests(unittest.TestCase):
             payload["variables"]["input"]["metadata"],
             {"facebook": {"type": "post"}},
         )
+
+    def test_publish_now_edits_existing_post_instead_of_creating_one(self):
+        response = Mock(status_code=200, headers={})
+        response.json.return_value = {"data": {"editPost": {"post": {"id": "existing-1"}}}}
+        session = Mock()
+        session.post.return_value = response
+
+        post = publish_now("existing-1", "test-key", session=session)
+
+        self.assertEqual(post["id"], "existing-1")
+        payload = session.post.call_args.kwargs["json"]
+        self.assertIn("editPost", payload["query"])
+        self.assertNotIn("createPost", payload["query"])
+        self.assertEqual(payload["variables"]["input"], {"id": "existing-1", "mode": "shareNow"})
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,48 @@
+name: Publish existing Buffer posts now
+
+on:
+  workflow_dispatch:
+    inputs:
+      facebook_post_id:
+        description: 'Existing queued Facebook post ID'
+        required: true
+        type: string
+      twitter_post_id:
+        description: 'Existing queued X/Twitter post ID'
+        required: true
+        type: string
+
+concurrency:
+  group: sport803-buffer-publish-now
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish-existing-posts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r scripts/requirements.txt
+
+      - name: Publish existing posts now
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          FACEBOOK_POST_ID: ${{ inputs.facebook_post_id }}
+          TWITTER_POST_ID: ${{ inputs.twitter_post_id }}
+        run: >-
+          python scripts/publish_queued_now.py
+          --facebook-post-id "$FACEBOOK_POST_ID"
+          --twitter-post-id "$TWITTER_POST_ID"

@@ -14,6 +14,7 @@ The source publishes a usable RSS feed at `https://www.sport803.online/feeds/pos
 - X text is `title` + newline + `https://sport803.github.io/Today/`.
 - Buffer requests use bounded exponential backoff and honor retry/rate-limit headers when present.
 - Manual runs default to dry-run. Scheduled runs publish normally.
+- Existing posts can be switched from the queue to immediate publication with the separate **Publish existing Buffer posts now** workflow. It edits known Buffer post IDs using `shareNow` instead of creating duplicate posts.
 
 ## Setup
 
@@ -45,6 +46,7 @@ The source publishes a usable RSS feed at `https://www.sport803.online/feeds/pos
    ```
 
    The checker validates `og:title`, `og:description`, `og:image`, and `og:url`. Facebook may cache preview data; use [Meta Sharing Debugger](https://developers.facebook.com/tools/debug/) to refresh that cache if needed.
+7. To publish an already queued post immediately, open **Actions → Publish existing Buffer posts now → Run workflow** and enter its existing Facebook and X post IDs. This changes those posts to Buffer's `shareNow` mode; it does not create new posts.
 
 ## Local development
 
@@ -71,7 +73,9 @@ Set `MAX_POSTS_PER_RUN` to adjust the per-run backlog cap. `GITHUB_PAGES_URL` ov
 
 ```text
 .github/workflows/autopost.yml  Scheduled/manual workflow and Pages deployment
+.github/workflows/publish-now.yml Manual publishing of existing Buffer posts
 scripts/autopost.py             RSS parsing, deduplication, Buffer GraphQL client, HTML output
+scripts/publish_queued_now.py   Switch existing queued Buffer posts to shareNow
 scripts/check_open_graph.py     Article preview-tag verification helper
 scripts/requirements.txt        Python dependencies
 tests/test_autopost.py          Feed parsing and output tests
