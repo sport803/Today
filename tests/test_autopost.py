@@ -1,11 +1,12 @@
 """Unit tests for feed parsing and safe static-page rendering."""
 import sys
 import unittest
+from unittest.mock import Mock
 from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from autopost import Event, parse_feed, render_index
+from autopost import Event, buffer_create_post, parse_feed, render_index
 
 class FeedTests(unittest.TestCase):
     def test_rss_entries_and_duplicate_urls(self):
@@ -37,6 +38,24 @@ class FeedTests(unittest.TestCase):
 
     def test_empty_page_message(self):
         self.assertIn("No events are currently listed", render_index([]))
+
+    def test_buffer_facebook_post_includes_standard_post_type(self):
+        response = Mock(status_code=200, headers={})
+        response.json.return_value = {"data": {"createPost": {"post": {"id": "post-1"}}}}
+        session = Mock()
+        session.post.return_value = response
+
+        post = buffer_create_post(
+            "Event title\nhttps://example.com/event", "facebook-channel", "test-key",
+            session=session, metadata={"facebook": {"type": "post"}},
+        )
+
+        self.assertEqual(post["id"], "post-1")
+        payload = session.post.call_args.kwargs["json"]
+        self.assertEqual(
+            payload["variables"]["input"]["metadata"],
+            {"facebook": {"type": "post"}},
+        )
 
 if __name__ == "__main__":
     unittest.main()

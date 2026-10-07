@@ -166,7 +166,8 @@ def _retry_delay(response: requests.Response | None, attempt: int) -> float:
 
 def buffer_create_post(text: str, channel_id: str, api_key: str,
                        session: requests.Session | None = None,
-                       max_attempts: int = 5) -> dict[str, Any]:
+                       max_attempts: int = 5,
+                       metadata: dict[str, Any] | None = None) -> dict[str, Any]:
     """Create one queued Buffer post, retrying transient and rate-limit errors."""
     client = session or requests.Session()
     query = """mutation CreatePost($input: CreatePostInput!) {
@@ -175,10 +176,13 @@ def buffer_create_post(text: str, channel_id: str, api_key: str,
         ... on MutationError { message }
       }
     }"""
-    payload = {"query": query, "variables": {"input": {
+    post_input: dict[str, Any] = {
         "text": text, "channelId": channel_id,
         "schedulingType": "automatic", "mode": "addToQueue",
-    }}}
+    }
+    if metadata:
+        post_input["metadata"] = metadata
+    payload = {"query": query, "variables": {"input": post_input}}
     for attempt in range(max_attempts):
         response: requests.Response | None = None
         try:
@@ -277,7 +281,8 @@ def run(*, dry_run: bool = False) -> int:
             if dry_run:
                 LOG.info("DRY RUN [%s] %s", name, text.replace("\n", " | "))
                 continue
-            post = buffer_create_post(text, channel, key)
+            metadata = {"facebook": {"type": "post"}} if name == "facebook" else None
+            post = buffer_create_post(text, channel, key, metadata=metadata)
             progress[name] = True
             save_state(state)
             LOG.info("Queued %s post %s for %s", name, post.get("id", "(no id)"), event.title)
