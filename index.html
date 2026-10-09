@@ -326,6 +326,29 @@ a { color: inherit; text-decoration: none; }
 }
 .s803-footer a { color: #888; }
 .s803-footer a:hover { color: #e53935; }
+
+/* ─── Latest Sports 803 posts ──────────────────────────────── */
+.s803-events {
+  margin-top: 30px; padding: 16px;
+  background: #101010; border: 1px solid #242424; border-radius: 12px;
+}
+.s803-events-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.s803-events-head h2 {
+  margin: 0; color: #efefef;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  font-size: 16px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+}
+.s803-events-status { color: #666; font-size: 10px; white-space: nowrap; }
+.s803-events-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.s803-event-link {
+  display: block; min-width: 0; padding: 12px;
+  color: #eee; background: #141414; border: 1px solid #242424; border-radius: 9px;
+  font-size: 12px; font-weight: 650; line-height: 1.4;
+}
+.s803-event-link:hover { border-color: #e53935; background: #191313; }
+.s803-event-time { display: block; margin-top: 6px; color: #666; font-size: 10px; font-weight: 400; }
+.s803-events-empty { grid-column: 1 / -1; padding: 14px; color: #777; font-size: 12px; }
+@media (max-width: 560px) { .s803-events-list { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -354,6 +377,16 @@ a { color: inherit; text-decoration: none; }
   <div class="s803w">
     <div id="s803-matches" data-limit="48"></div>
   </div>
+
+  <section class="s803-events" aria-labelledby="s803-events-title">
+    <div class="s803-events-head">
+      <h2 id="s803-events-title">Latest Sports 803 Events</h2>
+      <span class="s803-events-status" id="s803-events-status">Loading…</span>
+    </div>
+    <div class="s803-events-list" id="s803-events-list">
+      <div class="s803-events-empty">Loading the latest posts…</div>
+    </div>
+  </section>
 
   <footer class="s803-footer">
     <a href="https://sports803livestream.blogspot.com" target="_blank" rel="noopener">Sports 803</a>
@@ -633,6 +666,69 @@ a { color: inherit; text-decoration: none; }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
+})();
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var list = document.getElementById('s803-events-list');
+  var status = document.getElementById('s803-events-status');
+  if (!list) return;
+
+  function show(events) {
+    var fragment = document.createDocumentFragment();
+    events.slice(0, 12).forEach(function (event) {
+      if (!event || typeof event.title !== 'string' || typeof event.url !== 'string' || !/^https?:\/\//i.test(event.url)) return;
+      var link = document.createElement('a');
+      link.className = 's803-event-link';
+      link.href = event.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = event.title;
+      if (event.updated) {
+        var time = document.createElement('span');
+        time.className = 's803-event-time';
+        var parsed = new Date(event.updated);
+        time.textContent = isNaN(parsed.getTime()) ? event.updated : parsed.toLocaleString();
+        link.appendChild(time);
+      }
+      fragment.appendChild(link);
+    });
+    if (!fragment.childNodes.length) {
+      var empty = document.createElement('div');
+      empty.className = 's803-events-empty';
+      empty.textContent = 'No recent sports posts are available.';
+      fragment.appendChild(empty);
+    }
+    list.replaceChildren(fragment);
+  }
+
+  function loadEvents() {
+    fetch('./events.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.json();
+      })
+      .then(function (data) {
+        show(Array.isArray(data.events) ? data.events : []);
+        if (status) {
+          var updated = new Date(data.updated_at || '');
+          status.textContent = isNaN(updated.getTime()) ? 'Updated automatically' :
+            'Updated ' + updated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+      })
+      .catch(function (error) {
+        console.warn('[S803] latest events error:', error && error.message);
+        if (status) status.textContent = 'Temporarily unavailable';
+        if (!list.querySelector('.s803-event-link')) {
+          list.innerHTML = '<div class="s803-events-empty">Latest posts are temporarily unavailable. <a href="./docs/">Open the event list</a>.</div>';
+        }
+      });
+  }
+
+  loadEvents();
+  setInterval(loadEvents, 5 * 60 * 1000);
 })();
 </script>
 

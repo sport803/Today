@@ -25,6 +25,7 @@ BUFFER_URL = "https://api.buffer.com"
 ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = ROOT / ".autopost-state.json"
 DOCS_PATH = ROOT / "docs" / "index.html"
+EVENTS_DATA_PATH = ROOT / "events.json"
 LOG = logging.getLogger("autopost")
 
 
@@ -212,6 +213,16 @@ def event_date(event: Event) -> str | None:
     return parsed.date().isoformat()
 
 
+def render_events_json(events: list[Event], generated_at: datetime | None = None) -> str:
+    """Render the latest feed entries as safe JSON for the repository-root homepage."""
+    now = generated_at or datetime.now(timezone.utc)
+    ordered = sorted(events, key=lambda event: (event_date(event) or "", event.updated), reverse=True)
+    return json.dumps({
+        "updated_at": now.isoformat(),
+        "events": [asdict(event) for event in ordered],
+    }, ensure_ascii=False, indent=2) + "\n"
+
+
 def save_state(state: dict[str, dict[str, bool]], path: Path = STATE_PATH) -> None:
     """Write state atomically so an interrupted run cannot truncate the file."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -307,6 +318,8 @@ def run(*, dry_run: bool = False) -> int:
     DOCS_PATH.parent.mkdir(parents=True, exist_ok=True)
     DOCS_PATH.write_text(render_index(events), encoding="utf-8")
     LOG.info("Wrote Pages index with %d feed entries", len(events))
+    EVENTS_DATA_PATH.write_text(render_events_json(events), encoding="utf-8")
+    LOG.info("Wrote root homepage event data with %d feed entries", len(events))
     if not events:
         LOG.info("Feed is empty; no social posts to send")
         return 0

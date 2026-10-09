@@ -1,12 +1,13 @@
 """Unit tests for feed parsing and safe static-page rendering."""
 import sys
+import json
 import unittest
 from unittest.mock import Mock
 from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from autopost import Event, buffer_create_post, fetch_facebook_link_attachment, parse_feed, render_index, select_pending_events
+from autopost import Event, buffer_create_post, fetch_facebook_link_attachment, parse_feed, render_events_json, render_index, select_pending_events
 from publish_queued_now import inspect_post, publish_now
 
 class FeedTests(unittest.TestCase):
@@ -45,6 +46,12 @@ class FeedTests(unittest.TestCase):
             [today, yesterday], {}, ("facebook", "twitter"), 10, post_date="2026-10-09",
         )
         self.assertEqual(selected, [today])
+
+    def test_root_events_json_sorts_latest_feed_updates_first(self):
+        older = Event("Older", "https://example.com/older", "2026-10-08T23:00:00-07:00")
+        newer = Event("Newer", "https://example.com/newer", "2026-10-09T02:00:00-07:00")
+        payload = json.loads(render_events_json([older, newer], datetime(2026, 10, 9, tzinfo=timezone.utc)))
+        self.assertEqual([event["title"] for event in payload["events"]], ["Newer", "Older"])
 
     def test_index_escapes_untrusted_content_and_links_to_original(self):
         page = render_index([Event('<script>alert("x")</script>', 'https://example.com/?a=1&b=2', 'today')],

@@ -7,7 +7,7 @@ The source publishes a usable RSS feed at `https://www.sport803.online/feeds/pos
 ## How it works
 
 - Runs every 15 minutes and can also be launched manually.
-- Rebuilds `docs/index.html` from up to 100 current feed entries.
+- Rebuilds `docs/index.html` and root-level `events.json` from up to 100 current feed entries. The existing Live Matches homepage reads `events.json` to show the latest Sports 803 posts without replacing its live-score view.
 - Publishes each new or updated feed item once per configured channel using Buffer's `shareNow` mode. On the first live run, it publishes only the newest feed item and seeds older entries as already handled, avoiding a historical backlog. Delivery state is stored in `.autopost-state.json`; successful per-channel sends are persisted immediately to avoid unnecessary duplicates after partial failures.
 - Processes pending entries in the feed's newest-first order, up to 10 items per run by default (`MAX_POSTS_PER_RUN`). Each item uses one Buffer call per channel; keep actual daily volume within Buffer's stated 250-call Free-plan daily limit.
 - Facebook text is `title` + newline + the original article URL. The workflow also supplies `metadata.facebook.linkAttachment` using the article's Open Graph title, description, and image so Buffer creates a rich link card.
@@ -80,4 +80,5 @@ scripts/check_open_graph.py     Article preview-tag verification helper
 scripts/requirements.txt        Python dependencies
 tests/test_autopost.py          Feed parsing and output tests
 docs/index.html                 Generated GitHub Pages page
+events.json                     Generated RSS data for the repository-root homepage
 ```
