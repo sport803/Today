@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from autopost import Event, buffer_create_post, fetch_facebook_link_attachment, parse_feed, render_index
+from autopost import Event, buffer_create_post, fetch_facebook_link_attachment, parse_feed, render_index, select_pending_events
 from publish_queued_now import inspect_post, publish_now
 
 class FeedTests(unittest.TestCase):
@@ -28,6 +28,15 @@ class FeedTests(unittest.TestCase):
         event, = parse_feed(xml)
         self.assertEqual(event.title, "Event")
         self.assertEqual(event.updated, "2026-10-06T12:00:00Z")
+
+    def test_pending_selection_keeps_newest_feed_item_first(self):
+        newest = Event("Newest", "https://example.com/new", "2026-10-09")
+        older = Event("Older", "https://example.com/old", "2026-10-08")
+        selected = select_pending_events([newest, older], {}, ("facebook", "twitter"), 1)
+        self.assertEqual(selected, [newest])
+
+        state = {newest.fingerprint: {"facebook": True, "twitter": True}}
+        self.assertEqual(select_pending_events([newest, older], state, ("facebook", "twitter"), 1), [older])
 
     def test_index_escapes_untrusted_content_and_links_to_original(self):
         page = render_index([Event('<script>alert("x")</script>', 'https://example.com/?a=1&b=2', 'today')],

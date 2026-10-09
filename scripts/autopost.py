@@ -186,6 +186,14 @@ def load_state(path: Path = STATE_PATH) -> dict[str, dict[str, bool]]:
         raise RuntimeError(f"Could not read posting state at {path}: {exc}") from exc
 
 
+def select_pending_events(events: list[Event], state: dict[str, dict[str, bool]],
+                          channel_names: tuple[str, ...], limit: int) -> list[Event]:
+    """Select unhandled events in source order (the RSS feed is newest-first)."""
+    pending = [event for event in events
+               if not all(state.get(event.fingerprint, {}).get(name) for name in channel_names)]
+    return pending[:limit]
+
+
 def save_state(state: dict[str, dict[str, bool]], path: Path = STATE_PATH) -> None:
     """Write state atomically so an interrupted run cannot truncate the file."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -311,9 +319,7 @@ def run(*, dry_run: bool = False) -> int:
             save_state(state)
         LOG.info("First run: bootstrapping from the newest feed item only")
     else:
-        pending = [event for event in events if not all(state.get(event.fingerprint, {}).get(name) for name in channels)]
-        # Feed order is newest first; send older outstanding posts first.
-        pending = list(reversed(pending))
+        pending = select_pending_events(events, state, tuple(channels), per_run_limit)
     selected = pending[:per_run_limit]
     if not selected:
         LOG.info("No new or updated entries; nothing to post")
