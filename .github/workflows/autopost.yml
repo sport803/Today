@@ -10,6 +10,15 @@ on:
         required: false
         type: boolean
         default: true
+      post_date:
+        description: 'Only post items with this RSS update date (YYYY-MM-DD); blank means no date filter'
+        required: false
+        type: string
+      max_posts_per_run:
+        description: 'Maximum number of pending items to publish in this run'
+        required: false
+        type: number
+        default: 10
 
 concurrency:
   # Keep scheduled runs from replacing a manually requested run while it is pending.
@@ -56,6 +65,8 @@ jobs:
           BUFFER_FACEBOOK_CHANNEL_ID: ${{ secrets.BUFFER_FACEBOOK_CHANNEL_ID }}
           BUFFER_TWITTER_CHANNEL_ID: ${{ secrets.BUFFER_TWITTER_CHANNEL_ID }}
           DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+          POST_DATE: ${{ inputs.post_date || '' }}
+          MAX_POSTS_PER_RUN: ${{ inputs.max_posts_per_run || '10' }}
         run: python scripts/autopost.py
 
       - name: Commit refreshed event page and delivery state

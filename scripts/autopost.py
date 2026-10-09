@@ -11,6 +11,7 @@ import time
 import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
@@ -187,11 +188,28 @@ def load_state(path: Path = STATE_PATH) -> dict[str, dict[str, bool]]:
 
 
 def select_pending_events(events: list[Event], state: dict[str, dict[str, bool]],
-                          channel_names: tuple[str, ...], limit: int) -> list[Event]:
-    """Select unhandled events in source order (the RSS feed is newest-first)."""
+                          channel_names: tuple[str, ...], limit: int,
+                          post_date: str | None = None) -> list[Event]:
+    """Select unhandled events in source order, optionally restricted to an update date."""
     pending = [event for event in events
-               if not all(state.get(event.fingerprint, {}).get(name) for name in channel_names)]
+               if (post_date is None or event_date(event) == post_date)
+               and not all(state.get(event.fingerprint, {}).get(name) for name in channel_names)]
     return pending[:limit]
+
+
+def event_date(event: Event) -> str | None:
+    """Return the feed item's calendar date, supporting ISO and RFC 822 timestamps."""
+    stamp = event.updated.strip()
+    if not stamp:
+        return None
+    try:
+        parsed = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+    except ValueError:
+        try:
+            parsed = parsedate_to_datetime(stamp)
+        except (TypeError, ValueError, OverflowError):
+            return None
+    return parsed.date().isoformat()
 
 
 def save_state(state: dict[str, dict[str, bool]], path: Path = STATE_PATH) -> None:
@@ -293,6 +311,15 @@ def run(*, dry_run: bool = False) -> int:
         LOG.info("Feed is empty; no social posts to send")
         return 0
 
+    post_date = os.getenv("POST_DATE", "").strip() or None
+    if post_date:
+        try:
+            if datetime.strptime(post_date, "%Y-%m-%d").date().isoformat() != post_date:
+                raise ValueError
+        except ValueError as exc:
+            raise RuntimeError("POST_DATE must use YYYY-MM-DD format.") from exc
+        LOG.info("Restricting Buffer posts to feed items updated on %s", post_date)
+
     state = load_state()
     first_run = not state
     key = os.getenv("BUFFER_API_KEY", "").strip()
@@ -308,8 +335,19 @@ def run(*, dry_run: bool = False) -> int:
         if missing:
             raise RuntimeError("Missing required environment variable(s): " + ", ".join(missing))
 
-    per_run_limit = max(1, int(os.getenv("MAX_POSTS_PER_RUN", "1")))
-    if first_run:
+    per_run_limit = max(1, int(os.getenv("MAX_POSTS_PER_RUN", "10")))
+    if post_date and not dry_run:
+        stale_count = 0
+        for event in events:
+            day = event_date(event)
+            if day and day < post_date:
+                state.setdefault(event.fingerprint, {}).update({name: True for name in channels})
+                stale_count += 1
+        if stale_count:
+            save_state(state)
+            LOG.info("Marked %d older feed items as handled without posting", stale_count)
+
+    if first_run and not post_date:
         # Avoid queueing a historical backlog when the workflow is first enabled.
         # The feed is newest-first; older items remain in the public index only.
         for older_event in events[1:]:
@@ -319,7 +357,7 @@ def run(*, dry_run: bool = False) -> int:
             save_state(state)
         LOG.info("First run: bootstrapping from the newest feed item only")
     else:
-        pending = select_pending_events(events, state, tuple(channels), per_run_limit)
+        pending = select_pending_events(events, state, tuple(channels), per_run_limit, post_date)
     selected = pending[:per_run_limit]
     if not selected:
         LOG.info("No new or updated entries; nothing to post")

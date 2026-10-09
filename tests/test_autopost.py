@@ -38,6 +38,14 @@ class FeedTests(unittest.TestCase):
         state = {newest.fingerprint: {"facebook": True, "twitter": True}}
         self.assertEqual(select_pending_events([newest, older], state, ("facebook", "twitter"), 1), [older])
 
+    def test_pending_selection_can_filter_to_rss_update_date(self):
+        today = Event("Today", "https://example.com/today", "2026-10-09T02:00:00-07:00")
+        yesterday = Event("Yesterday", "https://example.com/yesterday", "Thu, 08 Oct 2026 09:00:00 GMT")
+        selected = select_pending_events(
+            [today, yesterday], {}, ("facebook", "twitter"), 10, post_date="2026-10-09",
+        )
+        self.assertEqual(selected, [today])
+
     def test_index_escapes_untrusted_content_and_links_to_original(self):
         page = render_index([Event('<script>alert("x")</script>', 'https://example.com/?a=1&b=2', 'today')],
                             datetime(2026, 10, 7, tzinfo=timezone.utc))
