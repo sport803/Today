@@ -12,7 +12,8 @@ on:
         default: true
 
 concurrency:
-  group: sport803-autopost-${{ github.ref }}
+  # Keep scheduled runs from replacing a manually requested run while it is pending.
+  group: sport803-autopost-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: false
 
 permissions:
