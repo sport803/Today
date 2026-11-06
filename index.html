@@ -1,736 +1,2122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0b0b0b">
-
-<title>Live Matches · Sports 803</title>
-<meta name="description" content="Live and upcoming sports matches — football, basketball, motorsport and more. Updated in real time.">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://sport803.github.io/Today/">
-
-<!-- ═══════════════════════════════════════════════════════════
-     SOCIAL PREVIEW — Open Graph
-     Used by: Facebook, WhatsApp, Telegram, LinkedIn,
-              iMessage, Slack, Discord, Signal, Viber
-     ═══════════════════════════════════════════════════════════ -->
-<meta property="og:type"                content="website">
-<meta property="og:site_name"           content="Sports 803">
-<meta property="og:title"               content="Live Matches · Sports 803">
-<meta property="og:description"         content="Live and upcoming sports matches — football, basketball, motorsport and more. Updated in real time.">
-<meta property="og:url"                 content="https://sport803.github.io/Today/">
-<meta property="og:locale"              content="en_US">
-
-<!-- Preview image -->
-<meta property="og:image"        content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBygrSV4ccVRByMhAw7uaHBlK41HqaOHj84q110Px22Q&amp;s=10">
-<meta property="og:image:secure_url" content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBygrSV4ccVRByMhAw7uaHBlK41HqaOHj84q110Px22Q&amp;s=10">
-<meta property="og:image:type"   content="image/jpeg">
-<meta property="og:image:width"  content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt"    content="Sports 803 — Live football, basketball and motorsport">
-
-<!-- ═══════════════════════════════════════════════════════════
-     SOCIAL PREVIEW — Twitter / X
-     ═══════════════════════════════════════════════════════════ -->
-<meta name="twitter:card"        content="summary_large_image">
-<meta name="twitter:title"       content="Live Matches · Sports 803">
-<meta name="twitter:description" content="Live and upcoming sports matches — football, basketball, motorsport and more. Updated in real time.">
-<meta name="twitter:image"       content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBygrSV4ccVRByMhAw7uaHBlK41HqaOHj84q110Px22Q&amp;s=10">
-<meta name="twitter:image:alt"   content="Sports 803 — Live football, basketball and motorsport">
-
-<!-- Favicon -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23e53935'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-family='Arial' font-size='13' font-weight='bold'%3E803%3C/text%3E%3C/svg%3E">
-
-<style>
-/* ─── Base ─────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  background: #0a0a0a;
-  color: #efefef;
-  font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
-a { color: inherit; text-decoration: none; }
-
-/* ─── Page shell ──────────────────────────────────────────── */
-.s803-page {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px 16px 64px;
-}
-.s803-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.s803-logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px; height: 40px;
-  background: #e53935;
-  border-radius: 10px;
-  font-weight: 900;
-  font-size: 12px;
-  letter-spacing: -0.5px;
-  color: #fff;
-  flex-shrink: 0;
-}
-.s803-title {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  margin: 0;
-}
-.s803-title small {
-  display: block;
-  font-size: 11px;
-  font-weight: 500;
-  color: #777;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-.s803-status {
-  margin-left: auto;
-  font-size: 11px;
-  color: #666;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-}
-.s803-status-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 0 0 rgba(34,197,94,.6);
-  animation: s803-pulse 2s ease-in-out infinite;
-}
-.s803-status.is-offline .s803-status-dot { background: #e53935; }
-
-/* ─── Filter pills ────────────────────────────────────────── */
-.s803-filters {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 16px;
-  scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
-          mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
-}
-.s803-filters::-webkit-scrollbar { display: none; }
-.s803-pill {
-  flex-shrink: 0;
-  padding: 7px 14px;
-  border-radius: 20px;
-  border: 1px solid #242424;
-  background: rgba(255,255,255,0.04);
-  color: #9a9a9a;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-  font-family: inherit;
-}
-.s803-pill:hover { color: #efefef; border-color: #333; }
-.s803-pill.is-active {
-  background: #e53935;
-  border-color: #e53935;
-  color: #fff;
-  box-shadow: 0 0 12px rgba(229,57,53,0.28);
-}
-.s803-pill .s803-pill-count {
-  display: inline-block;
-  margin-left: 6px;
-  font-size: 10px;
-  opacity: 0.7;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   MATCH FEED
-   ═══════════════════════════════════════════════════════════ */
-.s803w, .s803w * { box-sizing: border-box; }
-.s803w {
-  width: 100%; max-width: 100%;
-  margin: 0; padding: 0;
-  font-family: 'Barlow', Arial, sans-serif;
-}
-.s803w > [id="s803-matches"],
-.s803w > .s803-match-feed {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  width: 100%; min-width: 0;
-  margin: 0; padding: 0;
-}
-.s803-feed-hd, .s803-empty, .s803-skel { grid-column: 1 / -1; }
-
-.match-card {
-  width: 100%; min-width: 0; margin: 0;
-  overflow: hidden;
-  background: #111;
-  border: 1px solid #222;
-  border-radius: 12px;
-  transition: border-color .2s, box-shadow .2s, transform .15s;
-}
-.match-card:hover { border-color: #e53935; transform: translateY(-2px); }
-.match-card.is-live {
-  border-color: rgba(229,57,53,.5);
-  box-shadow: 0 0 0 1px rgba(229,57,53,.12);
-}
-.match-card > a { display: block; color: #fff; text-decoration: none; }
-.match-card > a:hover { background: rgba(255,255,255,.02); }
-
-.match-row {
-  display: flex; align-items: center; justify-content: space-between;
-  min-width: 0;
-  padding: 12px 10px;
-}
-.match-card .team {
-  display: flex; flex: 0 1 70px;
-  flex-direction: column; align-items: center;
-  gap: 5px; min-width: 0; text-align: center;
-}
-.match-card .tlogo,
-.match-card .tlogo-fb {
-  width: 44px; height: 44px; flex: 0 0 44px;
-  border-radius: 50%;
-}
-.match-card .tlogo { object-fit: contain; background: #1a1a1a; padding: 4px; }
-.match-card .tlogo-fb {
-  display: none; align-items: center; justify-content: center;
-  background: #1a1a1a; font-size: 19px;
-}
-.match-card .tname {
-  width: 100%; overflow: hidden;
-  color: #ccc; font-size: 10px; line-height: 1.25;
-  text-overflow: ellipsis; white-space: nowrap;
-}
-.match-card .mc { flex: 1 1 auto; min-width: 0; padding: 0 3px; text-align: center; }
-.match-card .score {
-  overflow: hidden; color: #fff; font-size: 19px; font-weight: 800;
-  letter-spacing: 1px; text-overflow: ellipsis; white-space: nowrap;
-}
-.match-card .badge {
-  display: inline-block; margin-top: 5px;
-  padding: 3px 7px; border-radius: 20px;
-  font-size: 9px; font-weight: 600; letter-spacing: .3px;
-  white-space: nowrap;
-}
-.match-card .badge.upcoming { color: #4caf50; background: #1a2a1a; border: 1px solid #2e5c2e; }
-.match-card .badge.live { color: #fff; background: #e53935; animation: s803p 1.5s infinite; }
-.match-card .badge.ended { color: #666; background: #1e1e1e; border: 1px solid #333; }
-.match-card .cd { min-height: 13px; margin-top: 3px; color: #666; font-size: 9px; white-space: nowrap; }
-
-.match-meta {
-  display: flex; align-items: center; flex-wrap: wrap;
-  gap: 4px; min-width: 0;
-  padding: 7px 9px;
-  border-top: 1px solid #1c1c1c;
-}
-.match-card .meta-tag {
-  max-width: 100%; overflow: hidden;
-  padding: 3px 6px;
-  color: #777; background: #1a1a1a;
-  border-radius: 6px; font-size: 9px;
-  text-overflow: ellipsis; white-space: nowrap;
-}
-.match-card .meta-tag:first-child {
-  color: #e53935; background: rgba(229,57,53,.1);
-  border: 1px solid rgba(229,57,53,.2);
-}
-.match-card .watch-btn {
-  display: inline-flex; align-items: center; gap: 3px;
-  margin-left: auto; padding: 3px 7px;
-  color: #ef9a9a;
-  background: rgba(229,57,53,.12);
-  border: 1px solid rgba(229,57,53,.3);
-  border-radius: 20px;
-  font-family: 'Barlow Condensed', Arial, sans-serif;
-  font-size: 9px; font-weight: 700;
-  letter-spacing: .2px; text-decoration: none; white-space: nowrap;
-}
-.match-card .watch-btn:hover { color: #fff; background: rgba(229,57,53,.25); }
-
-.s803-feed-hd { display: flex; align-items: center; gap: 8px; margin: 0 0 2px; }
-.s803-feed-hd h3 {
-  margin: 0; color: #efefef;
-  font-family: 'Barlow Condensed', Arial, sans-serif;
-  font-size: 15px; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase;
-}
-.s803-feed-ct {
-  padding: 1px 8px;
-  color: #e53935; background: rgba(229,57,53,.1);
-  border: 1px solid rgba(229,57,53,.2);
-  border-radius: 20px;
-  font-family: 'Barlow Condensed', Arial, sans-serif;
-  font-size: 11px; font-weight: 700;
-}
-.s803-skel {
-  height: 130px; margin: 0; border-radius: 12px;
-  background: linear-gradient(90deg,#111 25%,#171717 37%,#111 63%);
-  background-size: 400% 100%;
-  animation: s803sk 1.3s ease infinite;
-}
-.s803-empty {
-  padding: 26px 16px;
-  color: #666; background: #111;
-  border: 1px solid #222; border-radius: 12px;
-  font-size: 13px; text-align: center;
-}
-.s803-empty b {
-  display: block; margin-bottom: 4px; color: #999;
-  font-family: 'Barlow Condensed', Arial, sans-serif;
-  font-size: 14px; letter-spacing: 1px;
-}
-@keyframes s803p { 0%,100%{opacity:1} 50%{opacity:.6} }
-@keyframes s803sk { 0%{background-position:100% 50%} 100%{background-position:0 50%} }
-@keyframes s803-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.6)} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0)} }
-
-/* ─── Responsive ──────────────────────────────────────────── */
-@media (max-width: 899px) {
-  .s803w > [id="s803-matches"],
-  .s803w > .s803-match-feed { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
-}
-@media (max-width: 420px) {
-  .match-row { padding: 10px 6px; }
-  .match-card .team { flex-basis: 58px; }
-  .match-card .tlogo,
-  .match-card .tlogo-fb { width: 38px; height: 38px; flex-basis: 38px; }
-  .match-card .tname { font-size: 9px; }
-  .match-card .score { font-size: 17px; }
-  .match-card .badge { padding: 2px 5px; font-size: 8px; }
-  .match-card .meta-tag { font-size: 8px; }
-  .match-card .watch-btn { font-size: 8px; }
-  .s803-page { padding: 16px 10px 48px; }
-  .s803-title { font-size: 18px; }
-}
-
-/* ─── Footer ──────────────────────────────────────────────── */
-.s803-footer {
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid #1c1c1c;
-  font-size: 11px;
-  color: #555;
-  text-align: center;
-}
-.s803-footer a { color: #888; }
-.s803-footer a:hover { color: #e53935; }
-
-/* ─── Latest Sports 803 posts ──────────────────────────────── */
-.s803-events {
-  margin-top: 30px; padding: 16px;
-  background: #101010; border: 1px solid #242424; border-radius: 12px;
-}
-.s803-events-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.s803-events-head h2 {
-  margin: 0; color: #efefef;
-  font-family: 'Barlow Condensed', Arial, sans-serif;
-  font-size: 16px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
-}
-.s803-events-status { color: #666; font-size: 10px; white-space: nowrap; }
-.s803-events-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
-.s803-event-link {
-  display: block; min-width: 0; padding: 12px;
-  color: #eee; background: #141414; border: 1px solid #242424; border-radius: 9px;
-  font-size: 12px; font-weight: 650; line-height: 1.4;
-}
-.s803-event-link:hover { border-color: #e53935; background: #191313; }
-.s803-event-time { display: block; margin-top: 6px; color: #666; font-size: 10px; font-weight: 400; }
-.s803-events-empty { grid-column: 1 / -1; padding: 14px; color: #777; font-size: 12px; }
-@media (max-width: 560px) { .s803-events-list { grid-template-columns: 1fr; } }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin" />
+    <title>Blogger Movie Poster Pro - Upgraded V4</title>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a2332;
+            --bg-card-hover: #243447;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #e50914;
+            --accent-hover: #f6121d;
+            --border: #2d3a4f;
+            --radius: 12px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --transition: 0.3s ease;
+            --success: #22c55e;
+            --warning: #eab308;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        a:hover {
+            color: var(--accent-hover);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            background: rgba(17, 24, 39, 0.95);
+        }
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .logo span {
+            color: var(--accent);
+        }
+        .logo small {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+            margin-left: 2px;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .header-actions .blogger-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-actions .blogger-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .header-actions .blogger-status .dot.online {
+            background: var(--success);
+        }
+        .header-actions .blogger-status .dot.offline {
+            background: var(--text-muted);
+        }
+        .btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: scale(1.02);
+        }
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--text-muted);
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            opacity: 0.85;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .btn-xs {
+            padding: 3px 10px;
+            font-size: 11px;
+            border-radius: 14px;
+        }
+        .tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 12px 0 8px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
+            overflow-x: auto;
+        }
+        .tabs button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .tabs button:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .tabs button.active {
+            color: #fff;
+            background: var(--accent);
+        }
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding: 6px 0;
+        }
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .toolbar-left .select-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .toolbar-left .select-controls input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .filter-group select,
+        .filter-group input {
+            padding: 5px 10px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            transition: var(--transition);
+        }
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.12);
+        }
+        .filter-group input[type="number"] {
+            width: 70px;
+            -moz-appearance: textfield;
+        }
+        .filter-group input[type="number"]::-webkit-outer-spin-button,
+        .filter-group input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .search-box {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .search-box input {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            width: 180px;
+            transition: var(--transition);
+        }
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15);
+        }
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+        .search-box button {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .search-box button:hover {
+            background: var(--accent-hover);
+        }
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media(min-width:640px) {
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+        @media(min-width:1024px) {
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+        .movie-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid transparent;
+            transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--border);
+            background: var(--bg-card-hover);
+        }
+        .movie-card .poster-wrap {
+            position: relative;
+            aspect-ratio: 2/3;
+            background: var(--bg-primary);
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .movie-card .poster-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .movie-card:hover .poster-wrap img {
+            transform: scale(1.04);
+        }
+        .movie-card .poster-wrap .placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-secondary);
+        }
+        .movie-card .checkbox-overlay {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 6px;
+            padding: 4px 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .movie-card .checkbox-overlay.show {
+            opacity: 1;
+        }
+        .movie-card .checkbox-overlay input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .movie-card .checkbox-overlay label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .movie-card .badge-top {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            z-index: 2;
+        }
+        .movie-card .badge-embed {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            color: var(--text-secondary);
+            z-index: 2;
+        }
+        .movie-card .badge-embed.available {
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .movie-card .badge-embed.unavailable {
+            color: var(--text-muted);
+        }
+        .movie-card .badge-year {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            z-index: 2;
+        }
+        .movie-card .info {
+            padding: 10px 12px 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .movie-card .info .title {
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .movie-card .info .meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            flex-wrap: wrap;
+        }
+        .movie-card .info .meta .rating {
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .movie-card .post-btn {
+            margin-top: 6px;
+            padding: 4px 0;
+            border: none;
+            background: transparent;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+        }
+        .movie-card .post-btn:hover {
+            color: var(--accent-hover);
+        }
+        .movie-card.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
+        }
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 0 8px;
+            flex-wrap: wrap;
+        }
+        .pagination button {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 13px;
+        }
+        .pagination button:hover:not(:disabled) {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--text-muted);
+        }
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .pagination button.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .pagination .page-info {
+            color: var(--text-muted);
+            font-size: 13px;
+            padding: 0 8px;
+        }
+        .pagination .page-jump {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .pagination .page-jump input {
+            width: 55px;
+            padding: 5px 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 13px;
+            text-align: center;
+            outline: none;
+            transition: var(--transition);
+            -moz-appearance: textfield;
+        }
+        .pagination .page-jump input::-webkit-outer-spin-button,
+        .pagination .page-jump input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .pagination .page-jump input:focus {
+            border-color: var(--accent);
+        }
+        .pagination .page-jump button {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+        .blogger-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin: 16px 0 20px;
+        }
+        .blogger-panel .panel-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .blogger-panel .panel-row+.panel-row {
+            margin-top: 10px;
+        }
+        .blogger-panel label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .blogger-panel select,
+        .blogger-panel input[type="text"] {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition);
+            min-width: 160px;
+        }
+        .blogger-panel select:focus,
+        .blogger-panel input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+        .blogger-panel .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .blogger-panel .user-badge img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+        }
+        .blogger-panel .user-badge .name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .bulk-progress {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin: 12px 0;
+            display: none;
+        }
+        .bulk-progress.show {
+            display: block;
+        }
+        .bulk-progress .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 6px 0 10px;
+        }
+        .bulk-progress .progress-bar .fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .bulk-progress .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .bulk-progress .progress-items {
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .bulk-progress .progress-items .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .bulk-progress .progress-items .item.done {
+            color: var(--success);
+        }
+        .bulk-progress .progress-items .item.fail {
+            color: #dc2626;
+        }
+        .history-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin: 16px 0;
+        }
+        .history-section .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .history-section .header-row h3 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history-table th {
+            text-align: left;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        .history-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .history-table td .status {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .history-table td .status.success {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+        .history-table td .status.fail {
+            background: rgba(220, 38, 38, 0.15);
+            color: #dc2626;
+        }
+        .history-table td .status.pending {
+            background: rgba(234, 179, 8, 0.15);
+            color: var(--warning);
+        }
+        .history-table .empty-row td {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px 0;
+        }
+        .template-editor {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin: 16px 0;
+        }
+        .template-editor .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .template-editor .header-row h3 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .template-editor textarea {
+            width: 100%;
+            min-height: 250px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            outline: none;
+            transition: var(--transition);
+        }
+        .template-editor textarea:focus {
+            border-color: var(--accent);
+        }
+        .template-editor .preview-btn {
+            margin-top: 8px;
+        }
+        .manual-form {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin: 16px 0;
+        }
+        .manual-form .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .manual-form .header-row h3 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .manual-form .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .manual-form .form-grid .full {
+            grid-column: 1 / -1;
+        }
+        .manual-form label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .manual-form input,
+        .manual-form textarea {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition);
+        }
+        .manual-form input:focus,
+        .manual-form textarea:focus {
+            border-color: var(--accent);
+        }
+        .manual-form textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        .manual-form .actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            max-width: 900px;
+            width: 100%;
+            max-height: 95vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .modal-close {
+            position: sticky;
+            top: 10px;
+            right: 10px;
+            float: right;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 10px 0 0;
+        }
+        .modal-close:hover {
+            background: var(--accent);
+            transform: rotate(90deg);
+        }
+        .modal-body {
+            padding: 0 24px 28px;
+        }
+        .modal-poster {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: var(--bg-primary);
+            border-radius: var(--radius) var(--radius) 0 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .modal-poster iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .modal-poster .player-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: var(--bg-primary);
+            color: var(--text-muted);
+            flex-direction: column;
+            gap: 10px;
+        }
+        .modal-info {
+            margin-top: 16px;
+        }
+        .modal-info h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .modal-info .sub {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        .modal-info .overview {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 700px;
+        }
+        .modal-info .actions {
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            max-width: 90%;
+        }
+        .toast {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            font-size: 14px;
+            animation: toastIn 0.3s ease;
+            text-align: center;
+            max-width: 100%;
+        }
+        .toast.error {
+            background: #7f1d1d;
+            border-color: #dc2626;
+        }
+        .toast.success {
+            background: #14532d;
+            border-color: var(--success);
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .footer {
+            padding: 24px 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+            margin-top: auto;
+        }
+        .loading-spinner {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+        }
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        @media(max-width:768px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toolbar-right {
+                justify-content: center;
+            }
+            .search-box input {
+                width: 140px;
+            }
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+            .manual-form .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .blogger-panel .panel-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .history-table {
+                font-size: 11px;
+            }
+            .history-table th,
+            .history-table td {
+                padding: 4px 6px;
+            }
+            .modal-body {
+                padding: 0 14px 18px;
+            }
+            .modal-info h2 {
+                font-size: 20px;
+            }
+            .filter-group {
+                flex-wrap: wrap;
+            }
+            .pagination .page-jump input {
+                width: 45px;
+            }
+        }
+        @media(max-width:480px) {
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 10px;
+            }
+            .movie-card .info .title {
+                font-size: 12px;
+            }
+            .container {
+                padding: 0 12px;
+            }
+            .toolbar-left {
+                gap: 6px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="s803-page">
+    <header class="header">
+        <div class="container">
+            <div class="logo">🎬 <span>Blogger</span>MoviePoster <small>· Pro V4</small></div>
+            <div class="header-actions">
+                <span class="blogger-status" id="bloggerStatus">
+                    <span class="dot offline" id="statusDot"></span>
+                    <span id="statusLabel">Not signed in</span>
+                </span>
+                <button class="btn btn-primary btn-sm" id="loginBtn">🔑 Sign in</button>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="display:none;">Sign out</button>
+            </div>
+        </div>
+    </header>
 
-  <header class="s803-header">
-    <div class="s803-logo">803</div>
-    <h1 class="s803-title">
-      Live Matches
-      <small>Sports 803 · Real-time feed</small>
-    </h1>
-    <div class="s803-status" id="s803-status">
-      <span class="s803-status-dot"></span>
-      <span id="s803-status-text">Connecting…</span>
+    <main class="container" style="flex:1;">
+
+        <!-- BLOGGER PANEL -->
+        <div class="blogger-panel" id="bloggerPanel">
+            <div class="panel-row">
+                <div class="user-badge" id="userBadge">
+                    <img id="userAvatar" src="" alt="avatar" />
+                    <span class="name" id="userName">Guest</span>
+                </div>
+                <label>Blog:
+                    <select id="blogSelect"><option value="">— Select blog —</option></select>
+                </label>
+                <button class="btn btn-secondary btn-sm" id="refreshBlogsBtn">🔄 Refresh</button>
+                <span style="font-size:12px;color:var(--text-muted);" id="blogStatus"></span>
+            </div>
+            <div class="panel-row" style="margin-top:6px;">
+                <label style="font-size:12px;color:var(--text-muted);">💡 Select movies/series below, then click "Post Selected"</label>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs" id="categoryTabs">
+            <button class="active" data-cat="trending">🔥 Trending</button>
+            <button data-cat="now_playing">🍿 Now Playing</button>
+            <button data-cat="top_rated">⭐ Top Rated</button>
+            <button data-cat="popular">📈 Popular</button>
+            <button data-cat="tv">📺 TV Series</button>
+            <button data-cat="old">🕰️ Old</button>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <div class="select-controls">
+                    <input type="checkbox" id="selectAllCheckbox" />
+                    <label for="selectAllCheckbox">Select All</label>
+                    <button class="btn btn-secondary btn-sm" id="deselectAllBtn">Deselect</button>
+                    <span style="font-size:12px;color:var(--text-muted);" id="selectedCount">0 selected</span>
+                </div>
+                <button class="btn btn-primary btn-sm" id="postSelectedBtn">📤 Post Selected</button>
+                <!-- MEDIA TYPE FILTER -->
+                <div class="filter-group">
+                    <span>🎯</span>
+                    <select id="mediaTypeFilter">
+                        <option value="all">All Types</option>
+                        <option value="movie">🎬 Movies Only</option>
+                        <option value="tv">📺 TV Shows Only</option>
+                    </select>
+                </div>
+                <!-- YEAR FILTER -->
+                <div class="filter-group">
+                    <span>📅</span>
+                    <input type="number" id="yearFilterInput" placeholder="Year" min="1900" max="2030" />
+                    <button class="btn btn-secondary btn-xs" id="applyYearBtn">Apply</button>
+                    <button class="btn btn-outline btn-xs" id="clearYearBtn">✕</button>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search movies/series..." />
+                    <button id="searchBtn">Go</button>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="clearSearchBtn">✕</button>
+            </div>
+        </div>
+
+        <!-- BULK PROGRESS -->
+        <div class="bulk-progress" id="bulkProgress">
+            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                <span id="progressLabel">Posting...</span>
+                <span id="progressCount">0 / 0</span>
+            </div>
+            <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+            <div class="progress-stats">
+                <span>✅ <span id="progressSuccess">0</span></span>
+                <span>❌ <span id="progressFail">0</span></span>
+                <span>⏳ <span id="progressPending">0</span></span>
+            </div>
+            <div class="progress-items" id="progressItems"></div>
+        </div>
+
+        <!-- MOVIE GRID -->
+        <div id="movieGrid" class="movie-grid">
+            <div class="loading-spinner">Loading…</div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination" id="pagination">
+            <button id="prevPageBtn" disabled>◀ Prev</button>
+            <span class="page-info" id="pageInfo">Page 1</span>
+            <div class="page-jump">
+                <span style="font-size:12px;color:var(--text-muted);">Go to:</span>
+                <input type="number" id="pageJumpInput" min="1" value="1" />
+                <button class="btn btn-secondary btn-xs" id="pageJumpBtn">Go</button>
+            </div>
+            <button id="nextPageBtn">Next ▶</button>
+        </div>
+
+        <!-- POST HISTORY -->
+        <div class="history-section" id="historySection">
+            <div class="header-row">
+                <h3>📋 Post History</h3>
+                <button class="btn btn-secondary btn-sm" id="clearHistoryBtn">Clear All</button>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="history-table" id="historyTable">
+                    <thead><tr><th>Title</th><th>Date</th><th>Status</th><th>Link</th></tr></thead>
+                    <tbody id="historyBody"><tr class="empty-row"><td colspan="4">No posts yet.</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TEMPLATE EDITOR -->
+        <div class="template-editor" id="templateEditor">
+            <div class="header-row">
+                <h3>📝 Post Template</h3>
+                <div>
+                    <button class="btn btn-secondary btn-sm" id="resetTemplateBtn">Reset Default</button>
+                    <button class="btn btn-primary btn-sm" id="saveTemplateBtn">💾 Save</button>
+                </div>
+            </div>
+            <textarea id="templateTextarea" spellcheck="false"></textarea>
+            <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-secondary btn-sm preview-btn" id="previewTemplateBtn">👁️ Preview</button>
+                <span style="font-size:11px;color:var(--text-muted);">Tags: <code>{title}</code> <code>{year}</code> <code>{description}</code> <code>{tags}</code> <code>{poster}</code> <code>{embed}</code> <code>{imdb}</code> <code>{episodeData}</code></span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <button class="modal-close" id="modalClose">✕</button>
+            <div class="modal-poster" id="modalPoster"><div class="player-placeholder">Loading…</div></div>
+            <div class="modal-body">
+                <div class="modal-info">
+                    <h2 id="modalTitle">—</h2>
+                    <div class="sub" id="modalSub">—</div>
+                    <div class="overview" id="modalOverview">—</div>
+                    <div class="actions">
+                        <button class="btn btn-primary" id="modalPlayBtn">▶ Play</button>
+                        <button class="btn btn-secondary" id="modalTrailerBtn">🎬 Trailer</button>
+                        <button class="btn btn-primary" id="modalPostBtn">📝 Post</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <nav class="s803-filters" id="s803-filters" aria-label="Filter matches">
-    <button class="s803-pill is-active" data-filter="all">All <span class="s803-pill-count" data-count="all">0</span></button>
-    <button class="s803-pill" data-filter="live">🔴 Live <span class="s803-pill-count" data-count="live">0</span></button>
-    <button class="s803-pill" data-filter="upcoming">Upcoming <span class="s803-pill-count" data-count="upcoming">0</span></button>
-    <button class="s803-pill" data-filter="ended">Ended <span class="s803-pill-count" data-count="ended">0</span></button>
-  </nav>
+    <!-- TOAST -->
+    <div class="toast-container" id="toastContainer"></div>
 
-  <div class="s803w">
-    <div id="s803-matches" data-limit="48"></div>
-  </div>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <p>🎥 <strong>Blogger Movie Poster Pro V4</strong> — All Episodes · Year Filter · Page Jump. Powered by <a href="https://www.themoviedb.org/" target="_blank">TMDB</a> &amp; <a href="https://developers.google.com/blogger" target="_blank">Blogger API</a>.</p>
+        </div>
+    </footer>
 
-  <section class="s803-events" aria-labelledby="s803-events-title">
-    <div class="s803-events-head">
-      <h2 id="s803-events-title">Latest Sports 803 Events</h2>
-      <span class="s803-events-status" id="s803-events-status">Loading…</span>
-    </div>
-    <div class="s803-events-list" id="s803-events-list">
-      <div class="s803-events-empty">Loading the latest posts…</div>
-    </div>
-  </section>
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        //  CONFIGURATION
+        // ═══════════════════════════════════════════════════════════════
+        const CLIENT_ID = '55046129292-15h9k5ga0lr1e3p3ptqg1iueeks49f7v.apps.googleusercontent.com';
+        const TMDB_API_KEY = '4ca723ffe03da0512b8e67d5faa4cdf0';
+        const TMDB_BASE = 'https://api.themoviedb.org/3';
+        const TMDB_IMAGE = 'https://image.tmdb.org/t/p/w500';
+        const VIDSRC_BASE = 'https://vidsrc.sh/embed';
 
-  <footer class="s803-footer">
-    <a href="https://sports803livestream.blogspot.com" target="_blank" rel="noopener">Sports 803</a>
-    · Data updates every 45 s
-  </footer>
+        // ═══════════════════════════════════════════════════════════════
+        //  GENRE MAP
+        // ═══════════════════════════════════════════════════════════════
+        const GENRE_MAP = {
+            28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime', 99: 'Documentary',
+            18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History', 27: 'Horror', 10402: 'Music',
+            9648: 'Mystery', 10749: 'Romance', 878: 'Science Fiction', 10770: 'TV Movie', 53: 'Thriller',
+            10752: 'War', 37: 'Western', 10759: 'Action & Adventure', 10762: 'Kids', 10763: 'News',
+            10764: 'Reality', 10765: 'Sci-Fi & Fantasy', 10766: 'Soap', 10767: 'Talk', 10768: 'War & Politics'
+        };
 
+        // ═══════════════════════════════════════════════════════════════
+        //  STATE
+        // ═══════════════════════════════════════════════════════════════
+        let accessToken = null;
+        let currentBlogId = localStorage.getItem('blogId') || '';
+        let currentCategory = 'trending';
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentMovies = [];
+        let isLoading = false;
+        let searchQuery = '';
+        let currentMediaType = 'all'; // 'all' | 'movie' | 'tv'
+        let currentYear = ''; // year filter
+        let selectedMovies = new Map();
+        let postHistory = JSON.parse(localStorage.getItem('postHistory') || '[]');
+        let postTemplate = localStorage.getItem('postTemplate') || defaultTemplate();
+        let bloggerUser = null;
+        let bloggerBlogs = [];
+
+        // ═══════════════════════════════════════════════════════════════
+        //  DOM REFS
+        // ═══════════════════════════════════════════════════════════════
+        const grid = document.getElementById('movieGrid');
+        const categoryTabs = document.getElementById('categoryTabs');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const pageJumpInput = document.getElementById('pageJumpInput');
+        const pageJumpBtn = document.getElementById('pageJumpBtn');
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const deselectAllBtn = document.getElementById('deselectAllBtn');
+        const selectedCount = document.getElementById('selectedCount');
+        const postSelectedBtn = document.getElementById('postSelectedBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const statusDot = document.getElementById('statusDot');
+        const statusLabel = document.getElementById('statusLabel');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const blogSelect = document.getElementById('blogSelect');
+        const refreshBlogsBtn = document.getElementById('refreshBlogsBtn');
+        const blogStatus = document.getElementById('blogStatus');
+        const bulkProgress = document.getElementById('bulkProgress');
+        const progressLabel = document.getElementById('progressLabel');
+        const progressCount = document.getElementById('progressCount');
+        const progressFill = document.getElementById('progressFill');
+        const progressSuccess = document.getElementById('progressSuccess');
+        const progressFail = document.getElementById('progressFail');
+        const progressPending = document.getElementById('progressPending');
+        const progressItems = document.getElementById('progressItems');
+        const historyBody = document.getElementById('historyBody');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const templateTextarea = document.getElementById('templateTextarea');
+        const saveTemplateBtn = document.getElementById('saveTemplateBtn');
+        const resetTemplateBtn = document.getElementById('resetTemplateBtn');
+        const previewTemplateBtn = document.getElementById('previewTemplateBtn');
+        const overlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const modalPoster = document.getElementById('modalPoster');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSub = document.getElementById('modalSub');
+        const modalOverview = document.getElementById('modalOverview');
+        const modalPlayBtn = document.getElementById('modalPlayBtn');
+        const modalTrailerBtn = document.getElementById('modalTrailerBtn');
+        const modalPostBtn = document.getElementById('modalPostBtn');
+        const toastContainer = document.getElementById('toastContainer');
+        const mediaTypeFilter = document.getElementById('mediaTypeFilter');
+        const yearFilterInput = document.getElementById('yearFilterInput');
+        const applyYearBtn = document.getElementById('applyYearBtn');
+        const clearYearBtn = document.getElementById('clearYearBtn');
+
+        // ═══════════════════════════════════════════════════════════════
+        //  UTILS
+        // ═══════════════════════════════════════════════════════════════
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function defaultTemplate() {
+            return `<div class="separator" style="display:none">
+  {poster}
 </div>
-
-<script>
-(function () {
-  'use strict';
-
-  /* ─────────────────────────────────────────────
-     CONFIG — edit these
-     ───────────────────────────────────────────── */
-  var FB_URL         = 'https://sports-803-1b806-default-rtdb.firebaseio.com';
-  var SITE_ID        = '';              // blank = read root-level "match_events"
-  var POLL_MS        = 45000;           // auto-refresh cadence
-  var KEEP_ENDED_MS  = 3 * 3600000;     // hide ended matches after 3 h
-  /* ─────────────────────────────────────────── */
-
-  var LIVE_S = ['STATUS_IN_PROGRESS','STATUS_HALFTIME','STATUS_IN_PROGRESS_2','STATUS_END_PERIOD','STATUS_OVERTIME','STATUS_SHOOTOUT'];
-  var END_S  = ['STATUS_FINAL','STATUS_FULL_TIME','STATUS_FINAL_OT','STATUS_FINAL_PEN','STATUS_POSTPONED','STATUS_CANCELED','STATUS_SUSPENDED','STATUS_ABANDONED'];
-
-  var state = {
-    data: {},
-    filter: 'all',
-    lastFetchOk: false
-  };
-
-  /* ── Helpers ─────────────────────────────── */
-  function $(id) { return document.getElementById(id); }
-  function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
-      .replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-  function feedUrl() {
-    var base = FB_URL.replace(/\/+$/, '');
-    var ns = SITE_ID ? SITE_ID.replace(/^\/+|\/+$/g, '') + '/' : '';
-    return base + '/' + ns + 'match_events.json';
-  }
-  function statusOf(p) {
-    if (p.statusType) {
-      if (LIVE_S.indexOf(p.statusType) > -1) return 'live';
-      if (END_S.indexOf(p.statusType)  > -1) return 'ended';
-    }
-    var t = new Date(p.kickoff).getTime();
-    if (isNaN(t)) return 'upcoming';
-    var now = Date.now();
-    if (now < t) return 'upcoming';
-    if (now < t + 6300000) return 'live';
-    return 'ended';
-  }
-  function labelOf(p, st) {
-    if (p.statusLabel) return p.statusLabel;
-    return st === 'live' ? 'LIVE' : st === 'ended' ? 'Ended' : 'Upcoming';
-  }
-  function timeLabel(iso) {
-    var d = new Date(iso);
-    if (isNaN(d)) return '--:--';
-    var h = d.getHours(), m = d.getMinutes(), ap = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    return h + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
-  }
-  function fallbackLogo(name) {
-    return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name || '?') +
-           '&size=64&background=1a1a1a&color=e53935&bold=true&rounded=true';
-  }
-
-  /* ── Card markup ─────────────────────────── */
-  function cardHtml(p) {
-    var st      = statusOf(p);
-    var lbl     = labelOf(p, st);
-    var score   = p.score || (p.isRacing ? '🏁' : '- -');
-    var emoji   = p.leagueEmoji || '⚽';
-    var href    = p.postUrl || '#';
-
-    var home = '<div class="team">' +
-      '<img class="tlogo" src="' + esc(p.homeLogo || fallbackLogo(p.homeName)) + '" alt="' + esc(p.homeName) + '" ' +
-      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
-      '<div class="tlogo-fb">' + emoji + '</div>' +
-      '<div class="tname">' + esc(p.homeName) + '</div></div>';
-
-    var away = p.isRacing
-      ? '<div class="team"><div class="tlogo" style="display:flex;align-items:center;justify-content:center;font-size:22px">' + emoji + '</div>' +
-        '<div class="tname">' + esc(p.leagueName) + '</div></div>'
-      : '<div class="team">' +
-        '<img class="tlogo" src="' + esc(p.awayLogo || fallbackLogo(p.awayName)) + '" alt="' + esc(p.awayName) + '" ' +
-        'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"/>' +
-        '<div class="tlogo-fb">' + emoji + '</div>' +
-        '<div class="tname">' + esc(p.awayName) + '</div></div>';
-
-    var watch = p.channelUrl
-      ? '<a class="watch-btn" href="' + esc(p.channelUrl) + '" rel="noopener">📺 Watch' +
-        (p.channelName ? ' · ' + esc(p.channelName) : '') + '</a>'
-      : '';
-
-    return '<div class="match-card' + (st === 'live' ? ' is-live' : '') + '" data-kickoff="' + esc(p.kickoff) + '">' +
-      '<a href="' + esc(href) + '"><div class="match-row">' +
-        home +
-        '<div class="mc"><div class="score">' + esc(score) + '</div>' +
-        '<div class="badge ' + st + '">' + esc(lbl) + '</div><div class="cd"></div></div>' +
-        away +
-      '</div></a>' +
-      '<div class="match-meta">' +
-        '<div class="meta-tag">' + emoji + ' ' + esc(p.leagueName || '') + '</div>' +
-        '<div class="meta-tag">' + timeLabel(p.kickoff) + '</div>' +
-        watch +
-      '</div></div>';
-  }
-
-  /* ── Get the filtered list ───────────────── */
-  function filteredList() {
-    var now = Date.now();
-    var list = Object.keys(state.data || {})
-      .map(function (k) { return state.data[k]; })
-      .filter(function (p) {
-        if (!p || !p.kickoff) return false;
-        var st = statusOf(p);
-        if (state.filter !== 'all' && st !== state.filter) return false;
-        if (st === 'ended') {
-          var t = new Date(p.kickoff).getTime();
-          if (!isNaN(t) && now - t > KEEP_ENDED_MS + 6300000) return false;
+<div style="font-size:16px;line-height:1.8;color:#e2e8f0;">
+    <p><strong>🎬 {title}</strong> ({year})</p>
+    <p>{description}</p>
+    <p><strong>🏷️ Tags:</strong> {tags}</p>
+    <p><small>IMDb: {imdb}</small></p>
+</div>
+<script type="application/json" id="episodeData">
+{episodeData}
+<\/script>
+<iframe id="media-player"
+  class="lazyload"
+  src="{embed}"
+  data-src="{embed}"
+  allow="autoplay; encrypted-media"
+  width="100%"
+  height="100%"
+  allowfullscreen>
+</iframe>`;
         }
-        return true;
-      });
 
-    var order = { live: 0, upcoming: 1, ended: 2 };
-    list.sort(function (a, b) {
-      var sa = order[statusOf(a)], sb = order[statusOf(b)];
-      if (sa !== sb) return sa - sb;
-      return new Date(a.kickoff) - new Date(b.kickoff);
-    });
-    return list;
-  }
-
-  /* ── Render ──────────────────────────────── */
-  function render() {
-    var box = $('s803-matches');
-    if (!box) return;
-    var limit = parseInt(box.getAttribute('data-limit'), 10) || 48;
-    var list = filteredList().slice(0, limit);
-
-    updateFilterCounts();
-
-    if (!list.length) {
-      box.innerHTML = '<div class="s803-empty"><b>Nothing scheduled right now</b>Check back closer to kick-off.</div>';
-      return;
-    }
-    box.innerHTML = list.map(cardHtml).join('');
-    tick();
-  }
-
-  function updateFilterCounts() {
-    var counts = { all: 0, live: 0, upcoming: 0, ended: 0 };
-    var now = Date.now();
-    Object.keys(state.data || {}).forEach(function (k) {
-      var p = state.data[k];
-      if (!p || !p.kickoff) return;
-      var st = statusOf(p);
-      if (st === 'ended') {
-        var t = new Date(p.kickoff).getTime();
-        if (!isNaN(t) && now - t > KEEP_ENDED_MS + 6300000) return;
-      }
-      counts.all++;
-      counts[st] = (counts[st] || 0) + 1;
-    });
-    document.querySelectorAll('.s803-pill-count').forEach(function (el) {
-      var key = el.getAttribute('data-count');
-      el.textContent = counts[key] || 0;
-    });
-  }
-
-  /* ── Local countdown / status ticker ─────── */
-  function tick() {
-    var cards = document.querySelectorAll('.match-card[data-kickoff]');
-    for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      var ko = card.getAttribute('data-kickoff');
-      if (!ko) continue;
-      var diff = new Date(ko) - Date.now();
-      var cd = card.querySelector('.cd');
-      var badge = card.querySelector('.badge');
-      if (!cd) continue;
-      if (diff > 0) {
-        var h = Math.floor(diff / 3600000), m = Math.floor(diff % 3600000 / 60000), s = Math.floor(diff % 60000 / 1000);
-        cd.textContent = h > 0 ? 'In ' + h + 'h ' + m + 'm'
-                       : m > 0 ? 'In ' + m + 'm ' + s + 's'
-                       : 'Starting!';
-        if (badge && badge.className.indexOf('ended') === -1) {
-          badge.textContent = 'Upcoming';
-          badge.className = 'badge upcoming';
+        function showToast(msg, type = 'info', duration = 4000) {
+            const el = document.createElement('div');
+            el.className = 'toast';
+            if (type === 'error') el.classList.add('error');
+            if (type === 'success') el.classList.add('success');
+            el.textContent = msg;
+            toastContainer.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(10px)';
+                setTimeout(() => el.remove(), 300);
+            }, duration);
         }
-        card.classList.remove('is-live');
-      } else if (diff > -6300000) {
-        cd.textContent = '';
-        if (badge && badge.className.indexOf('ended') === -1) {
-          badge.textContent = '🔴 LIVE';
-          badge.className = 'badge live';
+
+        // ═══════════════════════════════════════════════════════════════
+        //  GOOGLE OAUTH
+        // ═══════════════════════════════════════════════════════════════
+        let tokenClient = null;
+
+        function initOAuth() {
+            if (!CLIENT_ID || CLIENT_ID.includes('YOUR_GOOGLE')) return;
+            try {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CLIENT_ID,
+                    scope: 'https://www.googleapis.com/auth/blogger',
+                    callback: (resp) => {
+                        if (resp.error) { showToast('Auth error: ' + resp.error, 'error'); return; }
+                        accessToken = resp.access_token;
+                        localStorage.setItem('bloggerToken', accessToken);
+                        updateAuthUI(true);
+                        fetchBloggerInfo();
+                        showToast('✅ Signed in to Blogger', 'success');
+                    },
+                });
+            } catch (e) { console.error(e); }
         }
-        card.classList.add('is-live');
-      } else {
-        cd.textContent = '';
-        if (badge) { badge.textContent = 'Ended'; badge.className = 'badge ended'; }
-        card.classList.remove('is-live');
-      }
-    }
-  }
 
-  /* ── Network status pill ─────────────────── */
-  function setStatus(ok, text) {
-    state.lastFetchOk = ok;
-    var el = $('s803-status');
-    var txt = $('s803-status-text');
-    if (!el || !txt) return;
-    el.classList.toggle('is-offline', !ok);
-    txt.textContent = text;
-  }
-
-  /* ── Fetch ───────────────────────────────── */
-  function load() {
-    var box = $('s803-matches');
-    if (!box) return;
-
-    fetch(feedUrl(), { cache: 'no-store' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
-        state.data = data || {};
-        render();
-        var t = new Date();
-        setStatus(true, 'Live · ' + t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-      })
-      .catch(function (err) {
-        console.warn('[S803] feed error:', err && err.message);
-        setStatus(false, 'Offline · retrying');
-        if (!box.querySelector('.match-card')) {
-          box.innerHTML = '<div class="s803-empty"><b>Matches unavailable</b>Refresh in a moment.</div>';
+        function signIn() {
+            if (!tokenClient) initOAuth();
+            if (tokenClient) tokenClient.requestAccessToken({ prompt: 'consent' });
+            else showToast('OAuth not initialized. Check Client ID.', 'error');
         }
-      });
-  }
 
-  /* ── Boot ────────────────────────────────── */
-  function boot() {
-    var box = $('s803-matches');
-    if (box) {
-      box.innerHTML =
-        '<div class="s803-skel"></div><div class="s803-skel"></div>' +
-        '<div class="s803-skel"></div><div class="s803-skel"></div>';
-    }
-
-    /* Filter buttons */
-    document.querySelectorAll('.s803-pill').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        document.querySelectorAll('.s803-pill').forEach(function (b) { b.classList.remove('is-active'); });
-        btn.classList.add('is-active');
-        state.filter = btn.getAttribute('data-filter') || 'all';
-        render();
-      });
-    });
-
-    load();
-    setInterval(load, POLL_MS);
-    setInterval(tick, 1000);
-
-    /* Pause polling when tab is hidden — saves battery + Firebase quota */
-    document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'visible') load();
-    });
-
-    /* Refresh on network recovery */
-    window.addEventListener('online', load);
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-})();
-</script>
-
-<script>
-(function () {
-  'use strict';
-  var list = document.getElementById('s803-events-list');
-  var status = document.getElementById('s803-events-status');
-  if (!list) return;
-
-  function show(events) {
-    var fragment = document.createDocumentFragment();
-    events.slice(0, 12).forEach(function (event) {
-      if (!event || typeof event.title !== 'string' || typeof event.url !== 'string' || !/^https?:\/\//i.test(event.url)) return;
-      var link = document.createElement('a');
-      link.className = 's803-event-link';
-      link.href = event.url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = event.title;
-      if (event.updated) {
-        var time = document.createElement('span');
-        time.className = 's803-event-time';
-        var parsed = new Date(event.updated);
-        time.textContent = isNaN(parsed.getTime()) ? event.updated : parsed.toLocaleString();
-        link.appendChild(time);
-      }
-      fragment.appendChild(link);
-    });
-    if (!fragment.childNodes.length) {
-      var empty = document.createElement('div');
-      empty.className = 's803-events-empty';
-      empty.textContent = 'No recent sports posts are available.';
-      fragment.appendChild(empty);
-    }
-    list.replaceChildren(fragment);
-  }
-
-  function loadEvents() {
-    fetch('./events.json?t=' + Date.now(), { cache: 'no-store' })
-      .then(function (response) {
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        return response.json();
-      })
-      .then(function (data) {
-        show(Array.isArray(data.events) ? data.events : []);
-        if (status) {
-          var updated = new Date(data.updated_at || '');
-          status.textContent = isNaN(updated.getTime()) ? 'Updated automatically' :
-            'Updated ' + updated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        function signOutUser() {
+            accessToken = null;
+            localStorage.removeItem('bloggerToken');
+            bloggerUser = null;
+            bloggerBlogs = [];
+            updateAuthUI(false);
+            showToast('Signed out', 'info');
         }
-      })
-      .catch(function (error) {
-        console.warn('[S803] latest events error:', error && error.message);
-        if (status) status.textContent = 'Temporarily unavailable';
-        if (!list.querySelector('.s803-event-link')) {
-          list.innerHTML = '<div class="s803-events-empty">Latest posts are temporarily unavailable. <a href="./docs/">Open the event list</a>.</div>';
+
+        function updateAuthUI(isSignedIn) {
+            if (isSignedIn && accessToken) {
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+                statusDot.className = 'dot online';
+                statusLabel.textContent = 'Signed in';
+                if (bloggerUser) {
+                    userName.textContent = bloggerUser.displayName || 'Blogger User';
+                    userAvatar.src = bloggerUser.picture || '';
+                }
+            } else {
+                loginBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+                statusDot.className = 'dot offline';
+                statusLabel.textContent = 'Not signed in';
+                userName.textContent = 'Guest';
+                userAvatar.src = '';
+                blogSelect.innerHTML = '<option value="">— Select blog —</option>';
+            }
         }
-      });
-  }
 
-  loadEvents();
-  setInterval(loadEvents, 5 * 60 * 1000);
-})();
-</script>
+        const savedToken = localStorage.getItem('bloggerToken');
+        if (savedToken) {
+            accessToken = savedToken;
+            updateAuthUI(true);
+            setTimeout(fetchBloggerInfo, 500);
+        }
 
+        loginBtn.addEventListener('click', signIn);
+        logoutBtn.addEventListener('click', signOutUser);
+
+        // ═══════════════════════════════════════════════════════════════
+        //  BLOGGER API
+        // ═══════════════════════════════════════════════════════════════
+        async function fetchBloggerInfo() {
+            if (!accessToken) return;
+            try {
+                const userResp = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                    headers: { 'Authorization': 'Bearer ' + accessToken }
+                });
+                const userData = await userResp.json();
+                if (userData.id) {
+                    bloggerUser = userData;
+                    userName.textContent = userData.name || 'Blogger User';
+                    userAvatar.src = userData.picture || '';
+                    updateAuthUI(true);
+                }
+                const blogsResp = await fetch('https://www.googleapis.com/blogger/v3/users/self/blogs', {
+                    headers: { 'Authorization': 'Bearer ' + accessToken }
+                });
+                const blogsData = await blogsResp.json();
+                if (blogsData.items && blogsData.items.length) {
+                    bloggerBlogs = blogsData.items;
+                    blogSelect.innerHTML = '<option value="">— Select blog —</option>' +
+                        blogsData.items.map(b =>
+                            `<option value="${b.id}" ${b.id === currentBlogId ? 'selected' : ''}>${b.name}</option>`
+                        ).join('');
+                    if (!currentBlogId && blogsData.items.length) {
+                        currentBlogId = blogsData.items[0].id;
+                        localStorage.setItem('blogId', currentBlogId);
+                        blogSelect.value = currentBlogId;
+                    }
+                    blogStatus.textContent = `📚 ${blogsData.items.length} blog(s) found`;
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        blogSelect.addEventListener('change', () => {
+            currentBlogId = blogSelect.value;
+            localStorage.setItem('blogId', currentBlogId);
+        });
+        refreshBlogsBtn.addEventListener('click', () => {
+            if (!accessToken) { showToast('Please sign in first.', 'error'); return; }
+            fetchBloggerInfo();
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        //  TMDB API HELPERS
+        // ═══════════════════════════════════════════════════════════════
+        async function fetchFromTMDB(endpoint, extraParams = {}) {
+            const url = new URL(TMDB_BASE + endpoint);
+            url.searchParams.set('api_key', TMDB_API_KEY);
+            url.searchParams.set('language', 'en-US');
+            for (const [k, v] of Object.entries(extraParams)) {
+                url.searchParams.set(k, v);
+            }
+            const resp = await fetch(url.toString());
+            if (!resp.ok) throw new Error(`TMDB error: ${resp.status}`);
+            return resp.json();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  FETCH ALL EPISODES FOR A TV SHOW (ALL SEASONS)
+        // ═══════════════════════════════════════════════════════════════
+        async function fetchTVDetails(tmdbId) {
+            // Fetch series info and external IDs in parallel
+            const [series, extIds] = await Promise.all([
+                fetchFromTMDB(`/tv/${tmdbId}`),
+                fetchFromTMDB(`/tv/${tmdbId}/external_ids`).catch(() => ({ imdb_id: null }))
+            ]);
+            const imdbId = extIds.imdb_id || null;
+            const allEpisodes = [];
+            const seasons = series.seasons || [];
+            // Filter out specials (season 0) and limit to 50 seasons max
+            const regularSeasons = seasons.filter(s => s.season_number > 0 && s.season_number <= 50);
+
+            for (const season of regularSeasons) {
+                try {
+                    const seasonData = await fetchFromTMDB(`/tv/${tmdbId}/season/${season.season_number}`);
+                    if (seasonData.episodes && seasonData.episodes.length > 0) {
+                        seasonData.episodes.forEach(ep => {
+                            allEpisodes.push({
+                                ep: ep.episode_number,
+                                s: season.season_number,
+                                src: `${VIDSRC_BASE}/${imdbId || tmdbId}/${season.season_number}/${ep.episode_number}`
+                            });
+                        });
+                    }
+                    // Small delay to respect TMDB rate limits
+                    await sleep(200);
+                } catch (e) {
+                    console.warn(`Failed to fetch season ${season.season_number} for TV ${tmdbId}`, e);
+                }
+            }
+            return { episodes: allEpisodes, imdbId: imdbId };
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  RENDER TEMPLATE
+        // ═══════════════════════════════════════════════════════════════
+        function renderTemplate(movie, template, episodes = []) {
+            const poster = movie.poster_path ?
+                (movie.poster_path.startsWith('http') ? movie.poster_path : TMDB_IMAGE + movie.poster_path) :
+                (movie.poster || '');
+
+            const imdbId = movie.imdb_id || movie.imdbId || '';
+            let embedUrl = imdbId ? `${VIDSRC_BASE}/${imdbId}` : '';
+
+            // For TV shows with episodes, use the first episode's src as the main embed
+            if (movie.media_type === 'tv' && episodes.length > 0) {
+                embedUrl = episodes[0].src;
+            }
+
+            const year = movie.year || '';
+            const tags = movie.tags || (movie.genre_names ? movie.genre_names.join(', ') : '');
+            const posterHtml = poster ? `<img src="${poster}" width="400"/>` : '';
+
+            let episodeDataJson = '[]';
+            if (movie.media_type === 'tv' && episodes.length > 0) {
+                // All episodes from all seasons
+                episodeDataJson = JSON.stringify(episodes, null, 2);
+            } else if (imdbId) {
+                // For movies, single entry
+                episodeDataJson = JSON.stringify([{ ep: 1, src: embedUrl }], null, 2);
+            }
+
+            return template
+                .replace(/\{title\}/g, movie.title || 'Untitled')
+                .replace(/\{year\}/g, year)
+                .replace(/\{description\}/g, (movie.overview || '').replace(/\n/g, '<br>'))
+                .replace(/\{tags\}/g, tags)
+                .replace(/\{poster\}/g, posterHtml)
+                .replace(/\{embed\}/g, embedUrl)
+                .replace(/\{imdb\}/g, imdbId)
+                .replace(/\{episodeData\}/g, episodeDataJson);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  POST TO BLOGGER
+        // ═══════════════════════════════════════════════════════════════
+        async function postToBlogger(movie) {
+            if (!accessToken) throw new Error('Not signed in');
+            if (!currentBlogId) throw new Error('No blog selected');
+
+            let episodes = [];
+            let imdbId = movie.imdb_id || movie.imdbId || '';
+
+            if (movie.media_type === 'tv' && movie.id) {
+                try {
+                    showToast(`Fetching all episodes for "${movie.title}"...`, 'info', 2500);
+                    const tvData = await fetchTVDetails(movie.id);
+                    episodes = tvData.episodes;
+                    if (!imdbId && tvData.imdbId) {
+                        imdbId = tvData.imdbId;
+                        movie.imdb_id = imdbId;
+                    }
+                    showToast(`Found ${episodes.length} episodes across all seasons`, 'success', 2000);
+                } catch (e) {
+                    console.warn('Failed to fetch TV details', e);
+                }
+            }
+
+            const title = (movie.title || 'Untitled') + (movie.year ? ` (${movie.year})` : '');
+            const content = renderTemplate(movie, templateTextarea.value || postTemplate, episodes);
+
+            // Build labels
+            const mediaTypeLabel = movie.media_type === 'tv' ? 'tv' : 'movie';
+            let labels = [mediaTypeLabel];
+            if (movie.genre_names && movie.genre_names.length) {
+                movie.genre_names.forEach(g => labels.push(g.toLowerCase()));
+            }
+            if (movie.genre_names && movie.genre_names.some(g => g.toLowerCase() === 'horror')) {
+                if (!labels.includes('horror')) labels.push('horror');
+            }
+            if (movie.tags) {
+                movie.tags.split(',').map(s => s.trim().toLowerCase()).filter(Boolean).forEach(t => {
+                    if (!labels.includes(t)) labels.push(t);
+                });
+            }
+            labels = [...new Set(labels)].filter(Boolean);
+
+            const postData = {
+                kind: 'blogger#post',
+                blog: { id: currentBlogId },
+                title: title,
+                content: content,
+                labels: labels,
+            };
+
+            const resp = await fetch(`https://www.googleapis.com/blogger/v3/blogs/${currentBlogId}/posts`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postData),
+            });
+
+            if (!resp.ok) {
+                const err = await resp.json();
+                throw new Error(err.error?.message || resp.statusText);
+            }
+            return await resp.json();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  LOAD CATEGORY & RENDER
+        // ═══════════════════════════════════════════════════════════════
+        async function loadCategory(cat, page = 1, query = '', mediaType = 'all', year = '') {
+            if (isLoading) return;
+            isLoading = true;
+            currentCategory = cat;
+            currentPage = page;
+            searchQuery = query;
+            currentMediaType = mediaType;
+            currentYear = year;
+            grid.innerHTML = '<div class="loading-spinner">Loading…</div>';
+
+            try {
+                let data;
+                let endpoint;
+                let params = { page };
+
+                if (query) {
+                    // ─── SEARCH MODE ───
+                    endpoint = '/search/multi';
+                    params.query = query;
+                } else if (year) {
+                    // ─── YEAR FILTER MODE ───
+                    if (mediaType === 'tv') {
+                        endpoint = '/discover/tv';
+                        params.first_air_date_year = year;
+                        params.sort_by = 'popularity.desc';
+                    } else if (mediaType === 'movie') {
+                        endpoint = '/discover/movie';
+                        params.primary_release_year = year;
+                        params.sort_by = 'popularity.desc';
+                    } else {
+                        // Default to movies when year is set with "all" type
+                        endpoint = '/discover/movie';
+                        params.primary_release_year = year;
+                        params.sort_by = 'popularity.desc';
+                    }
+                } else if (cat === 'old') {
+                    // ─── OLD CATEGORY ───
+                    if (mediaType === 'tv') {
+                        endpoint = '/discover/tv';
+                        params['first_air_date.lte'] = '2000-01-01';
+                        params.sort_by = 'popularity.desc';
+                    } else if (mediaType === 'movie') {
+                        endpoint = '/discover/movie';
+                        params['release_date.lte'] = '2000-01-01';
+                        params.sort_by = 'popularity.desc';
+                    } else {
+                        endpoint = '/discover/movie';
+                        params['release_date.lte'] = '2000-01-01';
+                        params.sort_by = 'popularity.desc';
+                    }
+                } else {
+                    // ─── STANDARD CATEGORIES ───
+                    const catEndpoints = {
+                        trending: mediaType === 'movie' ? '/trending/movie/day' :
+                            mediaType === 'tv' ? '/trending/tv/day' : '/trending/all/day',
+                        now_playing: '/movie/now_playing',
+                        top_rated: mediaType === 'tv' ? '/tv/top_rated' : '/movie/top_rated',
+                        popular: mediaType === 'tv' ? '/tv/popular' : '/movie/popular',
+                        tv: '/tv/popular',
+                    };
+                    endpoint = catEndpoints[cat] || catEndpoints.trending;
+                }
+
+                data = await fetchFromTMDB(endpoint, params);
+                totalPages = data.total_pages || 1;
+                const items = data.results || [];
+
+                // Determine media_type for each item
+                currentMovies = await Promise.all(items.map(async item => {
+                    let type = item.media_type;
+                    if (!type) {
+                        // Infer from endpoint or item properties
+                        if (item.title && !item.name) type = 'movie';
+                        else if (item.name && !item.title) type = 'tv';
+                        else if (cat === 'tv' || mediaType === 'tv') type = 'tv';
+                        else type = 'movie';
+                    }
+                    let imdbId = null;
+                    try {
+                        const ids = await fetchFromTMDB(`/${type}/${item.id}/external_ids`);
+                        imdbId = ids.imdb_id;
+                    } catch (e) { /* ignore */ }
+
+                    const genreNames = (item.genre_ids || []).map(id => GENRE_MAP[id]).filter(Boolean);
+
+                    return {
+                        ...item,
+                        id: item.id,
+                        media_type: type,
+                        title: item.title || item.name || 'Untitled',
+                        year: (item.release_date || item.first_air_date || '').split('-')[0],
+                        imdb_id: imdbId,
+                        embed_url: imdbId ? `${VIDSRC_BASE}/${imdbId}` : null,
+                        genre_names: genreNames
+                    };
+                }));
+
+                // After loading new page, clear selections
+                selectedMovies.clear();
+                renderMovies();
+                renderPagination();
+                updateSelectionUI();
+                // Update page jump input to current page
+                pageJumpInput.value = currentPage;
+                pageJumpInput.max = totalPages;
+            } catch (err) {
+                grid.innerHTML =
+                    `<div class="empty-state"><h3>Oops!</h3><p>${err.message}</p></div>`;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function renderMovies() {
+            if (currentMovies.length === 0) {
+                grid.innerHTML =
+                    '<div class="empty-state"><h3>No results found</h3><p>Try a different search, category, or filter.</p></div>';
+                return;
+            }
+            grid.innerHTML = currentMovies.map((m, i) => `
+                <div class="movie-card ${selectedMovies.has(i) ? 'selected' : ''}" data-idx="${i}">
+                    <div class="checkbox-overlay ${selectedMovies.has(i) ? 'show' : ''}">
+                        <input type="checkbox" ${selectedMovies.has(i) ? 'checked' : ''} />
+                    </div>
+                    <div class="poster-wrap">
+                        ${m.poster_path ? `<img src="${TMDB_IMAGE + m.poster_path}" alt="${m.title}" loading="lazy" />` : '<div class="placeholder">No Poster</div>'}
+                        <div class="badge-top">⭐ ${m.vote_average ? m.vote_average.toFixed(1) : 'N/A'}</div>
+                        <div class="badge-year">${m.year || '—'}</div>
+                        <div class="badge-embed ${m.imdb_id ? 'available' : 'unavailable'}">${m.media_type === 'tv' ? '📺 TV' : '🎬 Movie'}</div>
+                    </div>
+                    <div class="info">
+                        <div class="title">${m.title}</div>
+                        <button class="post-btn">Quick Post</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Attach event listeners
+            grid.querySelectorAll('.movie-card').forEach(card => {
+                const idx = parseInt(card.dataset.idx);
+                const movie = currentMovies[idx];
+                card.querySelector('.poster-wrap').onclick = () => openModal(movie);
+                card.querySelector('.post-btn').onclick = (e) => {
+                    e.stopPropagation();
+                    postSingle(movie);
+                };
+                card.onclick = (e) => {
+                    if (e.target.closest('.poster-wrap') || e.target.closest('.post-btn')) return;
+                    toggleSelect(idx, card);
+                };
+            });
+            syncSelectionToDOM();
+        }
+
+        function renderPagination() {
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= totalPages;
+            pageJumpInput.value = currentPage;
+            pageJumpInput.max = totalPages || 1;
+            pageJumpInput.min = 1;
+        }
+
+        // ─── SELECTION LOGIC ───
+        function toggleSelect(idx, card) {
+            if (selectedMovies.has(idx)) {
+                selectedMovies.delete(idx);
+            } else {
+                selectedMovies.set(idx, currentMovies[idx]);
+            }
+            updateSelectionUI();
+            syncCardSelection(card, selectedMovies.has(idx));
+        }
+
+        function syncCardSelection(card, isSelected) {
+            if (!card) return;
+            card.classList.toggle('selected', isSelected);
+            const overlay = card.querySelector('.checkbox-overlay');
+            if (overlay) overlay.classList.toggle('show', isSelected);
+            const cb = card.querySelector('input[type="checkbox"]');
+            if (cb) cb.checked = isSelected;
+        }
+
+        function syncSelectionToDOM() {
+            grid.querySelectorAll('.movie-card').forEach(card => {
+                const idx = parseInt(card.dataset.idx);
+                const isSelected = selectedMovies.has(idx);
+                syncCardSelection(card, isSelected);
+            });
+        }
+
+        function updateSelectionUI() {
+            selectedCount.textContent = `${selectedMovies.size} selected`;
+            postSelectedBtn.disabled = selectedMovies.size === 0;
+            selectAllCheckbox.checked =
+                selectedMovies.size === currentMovies.length && currentMovies.length > 0;
+        }
+
+        selectAllCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                currentMovies.forEach((movie, idx) => selectedMovies.set(idx, movie));
+            } else {
+                selectedMovies.clear();
+            }
+            updateSelectionUI();
+            syncSelectionToDOM();
+        });
+
+        deselectAllBtn.addEventListener('click', () => {
+            selectedMovies.clear();
+            updateSelectionUI();
+            syncSelectionToDOM();
+        });
+
+        async function postSingle(movie) {
+            if (!accessToken || !currentBlogId) {
+                showToast('Sign in and select a blog first.', 'error');
+                return;
+            }
+            try {
+                showToast(`Posting "${movie.title}"...`, 'info');
+                const res = await postToBlogger(movie);
+                addHistory({ title: movie.title, date: new Date().toISOString(), status: 'success',
+                link: res.url });
+                showToast(`✅ Posted: ${movie.title}`, 'success');
+            } catch (err) {
+                showToast(`Failed: ${err.message}`, 'error');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  MODAL
+        // ═══════════════════════════════════════════════════════════════
+        function openModal(movie) {
+            modalTitle.textContent = movie.title;
+            modalSub.innerHTML =
+                `<span>📅 ${movie.year || '—'}</span><span>⭐ ${movie.vote_average || 'N/A'}</span><span>${movie.media_type.toUpperCase()}</span>`;
+            modalOverview.textContent = movie.overview || 'No overview available.';
+            modalPoster.innerHTML = movie.embed_url ?
+                `<iframe src="${movie.embed_url}" allowfullscreen></iframe>` :
+                `<div class="player-placeholder">No embed available</div>`;
+            modalPostBtn.onclick = () => postSingle(movie);
+            overlay.classList.add('open');
+        }
+
+        function closeModal() {
+            overlay.classList.remove('open');
+            modalPoster.innerHTML = '';
+        }
+        modalClose.onclick = closeModal;
+        overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
+
+        // ═══════════════════════════════════════════════════════════════
+        //  HISTORY
+        // ═══════════════════════════════════════════════════════════════
+        function addHistory(entry) {
+            postHistory.unshift(entry);
+            localStorage.setItem('postHistory', JSON.stringify(postHistory.slice(0, 50)));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (postHistory.length === 0) {
+                historyBody.innerHTML = '<tr class="empty-row"><td colspan="4">No posts yet.</td></tr>';
+                return;
+            }
+            historyBody.innerHTML = postHistory.map(h => `
+                <tr>
+                    <td>${h.title}</td>
+                    <td>${new Date(h.date).toLocaleDateString()}</td>
+                    <td><span class="status ${h.status}">${h.status}</span></td>
+                    <td><a href="${h.link}" target="_blank">View</a></td>
+                </tr>
+            `).join('');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  INIT & EVENT BINDINGS
+        // ═══════════════════════════════════════════════════════════════
+        templateTextarea.value = postTemplate;
+
+        saveTemplateBtn.onclick = () => {
+            postTemplate = templateTextarea.value;
+            localStorage.setItem('postTemplate', postTemplate);
+            showToast('Template saved!', 'success');
+        };
+        resetTemplateBtn.onclick = () => {
+            templateTextarea.value = defaultTemplate();
+            postTemplate = templateTextarea.value;
+            localStorage.setItem('postTemplate', postTemplate);
+            showToast('Template reset to default.', 'info');
+        };
+        previewTemplateBtn.onclick = () => {
+            // Preview using the first movie in the grid or a dummy
+            const sample = currentMovies.length > 0 ? currentMovies[0] : {
+                title: 'Sample Movie',
+                year: '2024',
+                overview: 'This is a preview of how your template will look.',
+                media_type: 'movie',
+                imdb_id: 'tt1234567',
+                poster_path: '',
+                genre_names: ['Action', 'Drama'],
+                tags: 'Action, Drama'
+            };
+            const previewContent = renderTemplate(sample, templateTextarea.value, [
+                { ep: 1, s: 1, src: 'https://vidsrc.sh/embed/tt1234567/1/1' },
+                { ep: 2, s: 1, src: 'https://vidsrc.sh/embed/tt1234567/1/2' }
+            ]);
+            const previewWin = window.open('', '_blank', 'width=800,height=600');
+            if (previewWin) {
+                previewWin.document.write(
+                    '<html><head><title>Template Preview</title><style>body{font-family:sans-serif;padding:20px;background:#111;color:#e2e8f0;}</style></head><body>' +
+                    previewContent + '</body></html>');
+                previewWin.document.close();
+            } else {
+                showToast('Popup blocked. Allow popups for preview.', 'error');
+            }
+        };
+
+        // Category tabs
+        categoryTabs.querySelectorAll('button').forEach(btn => {
+            btn.onclick = () => {
+                categoryTabs.querySelector('.active').classList.remove('active');
+                btn.classList.add('active');
+                loadCategory(btn.dataset.cat, 1, searchQuery, currentMediaType, currentYear);
+            };
+        });
+
+        // Search
+        searchBtn.onclick = () => loadCategory(currentCategory, 1, searchInput.value, currentMediaType,
+            currentYear);
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            loadCategory(currentCategory, 1, '', currentMediaType, currentYear);
+        });
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadCategory(currentCategory, 1, searchInput.value, currentMediaType,
+                currentYear);
+        });
+
+        // Pagination
+        prevPageBtn.onclick = () => loadCategory(currentCategory, currentPage - 1, searchQuery, currentMediaType,
+            currentYear);
+        nextPageBtn.onclick = () => loadCategory(currentCategory, currentPage + 1, searchQuery, currentMediaType,
+            currentYear);
+
+        // Page jump
+        pageJumpBtn.onclick = () => {
+            const targetPage = parseInt(pageJumpInput.value);
+            if (isNaN(targetPage) || targetPage < 1 || targetPage > totalPages) {
+                showToast(`Please enter a page between 1 and ${totalPages}`, 'error');
+                return;
+            }
+            loadCategory(currentCategory, targetPage, searchQuery, currentMediaType, currentYear);
+        };
+        pageJumpInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') pageJumpBtn.click();
+        });
+
+        // Media type filter
+        mediaTypeFilter.addEventListener('change', () => {
+            currentMediaType = mediaTypeFilter.value;
+            loadCategory(currentCategory, 1, searchQuery, currentMediaType, currentYear);
+        });
+
+        // Year filter
+        applyYearBtn.onclick = () => {
+            const yearVal = yearFilterInput.value.trim();
+            if (yearVal && (isNaN(parseInt(yearVal)) || parseInt(yearVal) < 1900 || parseInt(yearVal) > 2030)) {
+                showToast('Please enter a valid year (1900-2030)', 'error');
+                return;
+            }
+            currentYear = yearVal;
+            loadCategory(currentCategory, 1, searchQuery, currentMediaType, currentYear);
+        };
+        clearYearBtn.onclick = () => {
+            yearFilterInput.value = '';
+            currentYear = '';
+            loadCategory(currentCategory, 1, searchQuery, currentMediaType, '');
+        };
+        yearFilterInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') applyYearBtn.click();
+        });
+
+        // Bulk post
+        postSelectedBtn.onclick = async () => {
+            const movies = Array.from(selectedMovies.values());
+            if (movies.length === 0) {
+                showToast('No items selected.', 'error');
+                return;
+            }
+            bulkProgress.classList.add('show');
+            progressCount.textContent = `0 / ${movies.length}`;
+            progressFill.style.width = '0%';
+            progressSuccess.textContent = '0';
+            progressFail.textContent = '0';
+            progressPending.textContent = movies.length;
+            progressItems.innerHTML = '';
+            let success = 0,
+                fail = 0;
+
+            for (let i = 0; i < movies.length; i++) {
+                const movie = movies[i];
+                progressLabel.textContent = `Posting "${movie.title}"...`;
+                progressPending.textContent = movies.length - i - 1;
+                try {
+                    const res = await postToBlogger(movie);
+                    success++;
+                    progressSuccess.textContent = success;
+                    addHistory({ title: movie.title, date: new Date().toISOString(), status: 'success',
+                        link: res.url });
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'item done';
+                    itemEl.innerHTML =
+                        `<span>✅ ${movie.title}</span><span>Posted</span>`;
+                    progressItems.appendChild(itemEl);
+                    progressItems.scrollTop = progressItems.scrollHeight;
+                } catch (e) {
+                    fail++;
+                    progressFail.textContent = fail;
+                    console.error(e);
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'item fail';
+                    itemEl.innerHTML =
+                        `<span>❌ ${movie.title}</span><span>${e.message}</span>`;
+                    progressItems.appendChild(itemEl);
+                    progressItems.scrollTop = progressItems.scrollHeight;
+                }
+                progressCount.textContent = `${i + 1} / ${movies.length}`;
+                progressFill.style.width = `${((i + 1) / movies.length) * 100}%`;
+
+                // Delay between posts to avoid quota
+                if (i < movies.length - 1) {
+                    progressLabel.textContent = '⏳ Waiting to avoid quota...';
+                    await sleep(3000);
+                }
+            }
+            progressLabel.textContent = `Finished! ✅ ${success} / ❌ ${fail}`;
+            showToast(`Bulk post finished. Success: ${success}, Fail: ${fail}`, success === movies.length ? 'success' :
+                'info');
+            selectedMovies.clear();
+            updateSelectionUI();
+            syncSelectionToDOM();
+            setTimeout(() => { bulkProgress.classList.remove('show'); }, 6000);
+        };
+
+        // Clear history
+        clearHistoryBtn.addEventListener('click', () => {
+            postHistory = [];
+            localStorage.removeItem('postHistory');
+            renderHistory();
+            showToast('History cleared.', 'info');
+        });
+
+        // Initialize
+        loadCategory('trending', 1, '', 'all', '');
+        initOAuth();
+        renderHistory();
+    </script>
 </body>
 </html>
